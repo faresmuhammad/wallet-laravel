@@ -9,7 +9,7 @@
 
                 <div class="col-md-6">
                     <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name"
-                           value="{{ old('name') }}" required autocomplete="name" autofocus>
+                           value="{{ old('name') }}" required autocomplete="off" autofocus>
                     @error('name')
                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -24,7 +24,7 @@
                 <div class="col-md-6">
                     <input id="color" type="color" class="form-control @error('color') is-invalid @enderror"
                            name="color"
-                           value="{{ old('color') }}" required autocomplete="color" autofocus>
+                           value="{{ old('color') }}" required autofocus>
                     @error('color')
                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -38,7 +38,7 @@
                 <div class="col-md-6">
                     <input id="initial-balance" type="number"
                            class="form-control @error('initial-balance') is-invalid @enderror" name="initial-balance"
-                           value="{{ old('initial-balance') }}" required autocomplete="initial-balance" autofocus>
+                           value="{{ old('initial-balance') }}" required autocomplete="off" autofocus>
                     @error('initial-balance')
                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
