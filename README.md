@@ -3,5 +3,5 @@ Wallet is an expense management system that I built using laravel, this applicat
 User can add a category for a record.
 
 Here is database diagram shows tables and relations between them
-<iframe width="560" height="315" src='https://dbdiagram.io/embed/647765c3722eb77494276d0c'> </iframe>
-
+***
+[![Wallet Database Design](/App%20Files/Wallet%20Database%20Design.png)](https://dbdiagram.io/d/647765c3722eb77494276d0c)
