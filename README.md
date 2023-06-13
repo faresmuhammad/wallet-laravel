@@ -12,4 +12,5 @@ User can add a category for a record.
 ***
 ### Video for demonstration
 ***
-![Video](/App%20Files/wallet.mp4)
+https://github.com/faresmuhammad/wallet-laravel/assets/49397455/5f0e3ecf-3fcb-4e1b-93f1-38ea21a5603d
+
