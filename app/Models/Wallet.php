@@ -16,7 +16,10 @@ class Wallet extends Model
     protected static function booted()
     {
         static::creating(function (Wallet $wallet) {
-            $wallet->user_id = 1;
+            if (auth()->user())
+                $wallet->user_id = auth()->id();
+            else
+                $wallet->user_id = 1;
         });
 
         static::created(function (Wallet $wallet) {
