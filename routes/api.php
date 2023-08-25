@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\API\V1\Auth\ForgotPasswordApiController;
+use App\Http\Controllers\API\V1\Auth\LoginApiController;
+use App\Http\Controllers\API\V1\Auth\RegisterApiController;
+use App\Http\Controllers\API\V1\Auth\ResetPasswordApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +20,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::middleware('guest')->group(function () {
+
+    Route::post('/register', [RegisterApiController::class, 'register']);
+    Route::post('/login', [LoginApiController::class, 'login']);
+    Route::post('/forgot-password', [ForgotPasswordApiController::class, 'sendResetLinkEmail']);
+    Route::post('/reset-password', [ResetPasswordApiController::class, 'reset']);
+
+});
+
+
+Route::middleware('auth:sanctum')->group(function () {
 });

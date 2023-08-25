@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\API\V1\Auth;
 
+use App\Http\Controllers\API\V1\Traits\AuthenticatesUsersApi;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Traits\AuthenticatesUsers;
-use App\Providers\RouteServiceProvider;
 
-class LoginController extends Controller
+class LoginApiController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
@@ -19,14 +18,13 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsersApi;
 
     /**
      * Where to redirect users after login.
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
