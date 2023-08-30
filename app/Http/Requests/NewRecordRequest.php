@@ -23,13 +23,13 @@ class NewRecordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount'=>'numeric',
-            'description'=>'nullable|string',
-            'balance_id'=>'integer',
-            'category_id'=>'integer',
-            'wallet_id'=>'integer',
-            'currency_id'=>'integer',
-            'date'=>'date|nullable'
+            'amount' => 'numeric',
+            'description' => 'nullable|string',
+            'balance_id' => 'integer',
+            'category_id' => 'integer',
+            'wallet_id' => 'integer',
+            'currency_id' => 'integer',
+            'date' => 'date|nullable'
         ];
     }
 }

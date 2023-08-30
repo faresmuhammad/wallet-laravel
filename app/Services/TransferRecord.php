@@ -14,17 +14,16 @@ class TransferRecord
 {
 
 
-    public function transfer(Wallet $wallet, TransferRecordRequest $request)
+    public function transfer(Wallet $wallet, TransferRecordRequest $request): JsonResponse
     {
-//        DB::transaction(function () use ($wallet, $request) {
         DB::beginTransaction();
         //Get Sender & Receiver Wallets
         $senderWallet = Wallet::find($request->sender_wallet);
         $receiverWallet = Wallet::find($request->receiver_wallet);
 
         //Get Sender & Receiver Balances according to the currency
-        $senderBalance = $senderWallet->balances()->where('currency_id', $request->currency)->first();
-        $receiverBalance = $receiverWallet->balances()->where('currency_id', $request->currency)->first();
+        $senderBalance = $senderWallet->balances()->where('currency_id', $request->currency_id)->first();
+        $receiverBalance = $receiverWallet->balances()->where('currency_id', $request->currency_id)->first();
 
         if (!$receiverBalance)
             return new JsonResponse([
@@ -37,7 +36,7 @@ class TransferRecord
 
         //Create a new record
         $record = new Record(
-            $request->validated()->safe()->only(['amount', 'currency_id', 'date']) +
+            $request->safe()->only(['amount', 'currency_id', 'date']) +
             [
                 'type' => 'Transfer',
                 'balance_id' => $senderBalance->id,
@@ -65,7 +64,7 @@ class TransferRecord
                 'wallet_id' => $senderWallet->id,
                 'balance_id' => $senderBalance->id
             ],
-            ['value' => $senderBalance->value]
+            ['value' => '$senderBalance->value']
         );
 
         //Create a transfer entry
@@ -78,7 +77,6 @@ class TransferRecord
             ]
         );
         DB::commit();
-//        });
         return new JsonResponse([
             'status' => 'Successful',
             'transfer_summary' => $transfer
