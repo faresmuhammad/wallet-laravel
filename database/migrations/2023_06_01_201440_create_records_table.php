@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->double('amount');
             $table->text('description')->nullable();
-            $table->enum('type',['Income','Expense','Transfer']);
+            $table->string('type');
             $table->double('balance_before')->default(0);
             $table->double('balance_after')->default(0);
             $table->dateTime('date');

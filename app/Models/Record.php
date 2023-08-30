@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RecordType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,8 +23,9 @@ class Record extends Model
         'date'
     ];
 
-    protected $casts =[
-      'date'=>'date'
+    protected $casts = [
+        'date' => 'date',
+        'type' => RecordType::class
     ];
 
     public $timestamps = false;

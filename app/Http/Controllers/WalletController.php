@@ -32,7 +32,7 @@ class WalletController extends Controller
             'name' => \request('name'),
             'color' => \request('color'),
             'initial_balance' => \request('initial-balance'),
-            'include_to_stats' => \request('include-stats') ?? false,
+            'include_to_stats' => \request('include-stats') ?? true,
 //            'user_id' => auth()->user()->id
         ]);
         return redirect('/wallets');
