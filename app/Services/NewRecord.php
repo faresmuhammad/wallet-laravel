@@ -8,10 +8,8 @@ use App\Models\Balance;
 use App\Models\BalancePerDate;
 use App\Models\Record;
 use App\Models\Wallet;
-use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Spatie\FlareClient\Http\Exceptions\NotFound;
 
 class NewRecord
 {
@@ -38,26 +36,26 @@ class NewRecord
         DB::transaction(function () use ($type, $wallet, $request) {
             $balance = Balance::find($request->balance_id);
             $record = new Record(
-                $request->validated()->safe()->except(['balance_before']
-                    + ['balance_before' => $balance->value])
+                $request->validated()
+                    + ['balance_before' => $balance->value]
             );
             switch ($type) {
                 case RecordType::Expense:
+                    $record->type = RecordType::Expense->name;
                     $balance->update([
                         'value' => $balance->value - $record->amount
                     ]);
                     break;
 
                 case RecordType::Income:
+                    $record->type = RecordType::Income->name;
                     $balance->update([
                         'value' => $balance->value + $record->amount
                     ]);
                     break;
 
                 default:
-                    return new JsonResponse([
-                        'message' => 'Record type isn\'t available'
-                    ]);
+                    throw new \Exception('Record type is not available');
             }
 
             $record->balance_after = $balance->value;
@@ -73,10 +71,6 @@ class NewRecord
                     'balance_id' => $balance->id
                 ]
             );
-
-            return new JsonResponse([
-                'message' => 'I guess it is successful'
-            ]);
         });
         return new JsonResponse([
             'status' => 'Successful',

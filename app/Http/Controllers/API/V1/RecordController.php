@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NewRecordRequest;
+use App\Http\Requests\TransferRecordRequest;
 use App\Http\Resources\RecordResource;
 use App\Models\Balance;
 use App\Models\BalancePerDate;
@@ -13,6 +14,7 @@ use App\Models\Record;
 use App\Models\Transfer;
 use App\Models\Wallet;
 use App\Services\NewRecord;
+use App\Services\TransferRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -35,77 +37,12 @@ class RecordController extends Controller
         return $service->topup($wallet, $request);
     }
 
-    public function transfer(Wallet $wallet)
+    public function transfer(Wallet $wallet, TransferRecord $service,TransferRecordRequest $request)
     {
-        return Db::transaction(function () use ($wallet) {
-            $senderWallet = Wallet::find(\request('sender'));
-            $receiverWallet = Wallet::find(\request('receiver'));
-            $senderBalance = $senderWallet->balances()->where('currency_id', \request('currency'))->limit(1)->first();
-            $receiverBalance = $receiverWallet->balances()->where('currency_id', \request('currency'))->limit(1)->first();
-            if (!$receiverBalance) {
-                return redirect()->route('newrecord', ['wallet' => $wallet->id])->with('message', 'Both balances don\'t match in currency');
-            }
-            if (\request('amount') > $senderBalance->value) {
-                return redirect()->route('newrecord', ['wallet' => $wallet->id])->with('message', 'This amount can\'t be transferred from sender');
-            }
-            $record = new Record([
-                'amount' => \request('amount'),
-                'type' => 'Transfer',
-                'balance_id' => $senderBalance->id,
-                'wallet_id' => $senderWallet->id,
-                'currency_id' => $senderBalance->currency->id,
-                'balance_before' => $senderBalance->value,
-                'date' => now()
-            ]);
-            $senderBalance->update([
-                'value' => $senderBalance->value - $record->amount
-            ]);
-            $receiverBalance->update([
-                'value' => $receiverBalance->value + $record->amount
-            ]);
-            BalancePerDate::updateOrCreate(
-                [
-                    'date' => today(),
-                    'wallet_id' => $senderWallet->id,
-                    'balance_id' => $senderBalance->id
-                ],
-                ['value' => $senderBalance->value]
-            );
-
-            BalancePerDate::updateOrCreate(
-                [
-                    'date' => today(),
-                    'wallet_id' => $receiverWallet->id,
-                    'balance_id' => $receiverBalance->id
-                ],
-                ['value' => $receiverBalance->value]
-            );
-            $record->balance_after = $senderBalance->value;
-            $record->save();
-            $transfer = new Transfer([
-                'amount' => \request('amount'),
-                'sender_balance' => $senderBalance->id,
-                'receiver_balance' => $receiverBalance->id,
-                'sender_wallet' => $senderWallet->id,
-                'receiver_wallet' => $receiverWallet->id,
-                'record_id' => $record->id
-            ]);
-            $transfer->save();
-            return redirect('/wallets');
-        });
+        return $service->transfer($wallet,$request);
     }
 
-    public function edit(Wallet $wallet, Record $record)
-    {
-        return view('record.edit', [
-            'wallet' => $wallet,
-            'balances' => $wallet->balances,
-            'categories' => Category::where('parent_id', null)->get(),
-            'wallets' => Wallet::where('user_id', auth()->user()->id)->get(),
-            'currencies' => Currency::all(),
-            'record' => $record
-        ]);
-    }
+
 
     public function update(Wallet $wallet, Record $record)
     {

@@ -25,13 +25,11 @@ class NewRecordRequest extends FormRequest
         return [
             'amount'=>'numeric',
             'description'=>'nullable|string',
-            'type'=>'in:Expense,Income,Transfer',
             'balance_id'=>'integer',
             'category_id'=>'integer',
             'wallet_id'=>'integer',
             'currency_id'=>'integer',
-            'balance_before'=>'numeric',
-            'date'=>'date'
+            'date'=>'date|nullable'
         ];
     }
 }

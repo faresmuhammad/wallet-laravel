@@ -23,8 +23,14 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::apiResource('/wallets',\App\Http\Controllers\API\V1\WalletController::class);
-    Route::get('/wallets/{wallet}/records',[\App\Http\Controllers\API\V1\RecordController::class,'index']);
+    Route::apiResource('/wallets', \App\Http\Controllers\API\V1\WalletController::class);
+    Route::prefix('/wallets/{wallet}')->group(function () {
+        Route::get('/records', [\App\Http\Controllers\API\V1\RecordController::class, 'index']);
+        Route::post('/pay', [\App\Http\Controllers\API\V1\RecordController::class, 'pay']);
+        Route::post('/topup', [\App\Http\Controllers\API\V1\RecordController::class, 'topup']);
+        Route::post('/transfer', [\App\Http\Controllers\API\V1\RecordController::class, 'transfer']);
+    });
+
 });
 
 Route::middleware('guest')->group(function () {
