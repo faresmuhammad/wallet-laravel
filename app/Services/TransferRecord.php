@@ -64,7 +64,7 @@ class TransferRecord
                 'wallet_id' => $senderWallet->id,
                 'balance_id' => $senderBalance->id
             ],
-            ['value' => '$senderBalance->value']
+            ['value' => $senderBalance->value]
         );
 
         //Create a transfer entry

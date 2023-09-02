@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\RecordType;
-use App\Http\Requests\NewRecordRequest;
+use App\Http\Requests\RecordRequest;
 use App\Models\Balance;
 use App\Models\BalancePerDate;
 use App\Models\Record;
@@ -14,18 +14,18 @@ use Illuminate\Support\Facades\DB;
 class NewRecord
 {
 
-    public function pay(Wallet $wallet, NewRecordRequest $request)
+    public function pay(Wallet $wallet, RecordRequest $request)
     {
         return $this->record($wallet, RecordType::Expense, $request);
     }
 
-    public function topup(Wallet $wallet, NewRecordRequest $request)
+    public function topup(Wallet $wallet, RecordRequest $request)
     {
         return $this->record($wallet, RecordType::Income, $request);
     }
 
 
-    private function record(Wallet $wallet, RecordType $type, NewRecordRequest $request)
+    private function record(Wallet $wallet, RecordType $type, RecordRequest $request)
     {
         /*
          * save the record

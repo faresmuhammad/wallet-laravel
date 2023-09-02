@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,7 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(10)->create();
+        User::create([
+            'name'=>'Fares Muhammad',
+            'password' => Hash::make('123456'),
+            'email' => 'fares.muhammad210@gmail.com'
+        ]);
 
         $this->call([
             CurrencySeeder::class,

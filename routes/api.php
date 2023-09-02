@@ -31,6 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/transfer', [\App\Http\Controllers\API\V1\RecordController::class, 'transfer']);
     });
 
+    Route::put('/records/{record}/update-record',[\App\Http\Controllers\API\V1\RecordController::class,'updateRecord']);
+    Route::put('/records/{record}/update-transfer',[\App\Http\Controllers\API\V1\RecordController::class,'updateTransfer']);
 });
 
 Route::middleware('guest')->group(function () {

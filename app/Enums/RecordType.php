@@ -2,9 +2,9 @@
 
 namespace App\Enums;
 
-enum RecordType
+enum RecordType: string
 {
-    case Expense;
-    case Income;
-    case Transfer;
+    case Expense = 'Expense';
+    case Income = 'Income';
+    case Transfer = 'Transfer';
 }
