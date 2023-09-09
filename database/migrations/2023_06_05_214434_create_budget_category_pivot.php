@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('budget_category_pivot', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->unsignedBigInteger('budget_id');
+            $table->unsignedBigInteger('category_id');
         });
     }
 

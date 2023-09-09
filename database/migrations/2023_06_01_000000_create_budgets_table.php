@@ -6,22 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    /*
-  type BudgetType
-  master_id bigint [ref: > Budget.id]
-  user_id bigint [ref: > User.id]
-     */
-    /*
-
-
-enum BudgetType{
-  Master
-  Repeatable
-}
-     */
     public function up(): void
     {
         Schema::create('budgets', function (Blueprint $table) {
@@ -29,12 +13,12 @@ enum BudgetType{
             $table->string('name',30)->unique();
             $table->double('target_amount');
             $table->double('current_amount')->default(0);
-            $table->enum('period',['One Time','Week','Month','Year']);
-            $table->enum('status',['Active','Finished','Not Started']);
+            $table->string('period');
+            $table->string('status');
             $table->date('start_at');
             $table->date('end_at');
-            $table->enum('type',['Master','Repeatable']);
-            $table->unsignedBigInteger('master_id');
+            $table->string('type');
+            $table->unsignedBigInteger('master_id')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
 
