@@ -7,6 +7,7 @@ use App\Http\Requests\RecordRequest;
 use App\Http\Requests\TransferRecordRequest;
 use App\Models\Balance;
 use App\Models\BalancePerDate;
+use App\Models\Budget;
 use App\Models\Record;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,10 @@ class EditRecord
          * update the balance
          * update the record
          * update balance per date
+         * ** Budget Updates **
+         * check the updated record category and wallet
+         * update the value if the updated record is still an expense record
+         * perform the budget calculations if it is changed to expense
          */
         DB::beginTransaction();
         $this->updateBalance(
@@ -29,8 +34,14 @@ class EditRecord
             RecordType::from($request->type)
         );
 
-        $this->updateRecord($record, $request);
 
+        $this->updateBudget(
+            $record,
+            $request->amount,
+            $record->type,
+            RecordType::from($request->type)
+        );
+        $this->updateRecord($record, $request);
         $this->updateBalancePerDate($record);
         DB::commit();
 
@@ -75,22 +86,40 @@ class EditRecord
     }
 
 
+    private function performTypeChange(
+        RecordType $from, RecordType $to,
+        ?\Closure  $expenseToExpense,
+        ?\Closure  $expenseToIncome,
+        ?\Closure  $incomeToExpense,
+        ?\Closure  $incomeToIncome,
+    )
+    {
+        if ($from === RecordType::Expense) {
+            if ($to === RecordType::Expense)
+                return $expenseToExpense();
+            else
+                return $expenseToIncome();
+        } else {
+            if ($to === RecordType::Expense)
+                return $incomeToExpense();
+            else
+                return $incomeToIncome();
+        }
+    }
+
     private function updatedValue(
         float $currentBalance, float $currentRecord,
         float $newRecord, RecordType $from, RecordType $to
     ): float
     {
-        if ($from === RecordType::Expense) {
-            if ($to === RecordType::Expense)
-                return $currentBalance + $currentRecord - $newRecord;
-            else
-                return $currentBalance + $currentRecord + $newRecord;
-        } else {
-            if ($to === RecordType::Expense)
-                return $currentBalance - $currentRecord - $newRecord;
-            else
-                return $currentBalance - $currentRecord + $newRecord;
-        }
+        return $this->performTypeChange(
+            $from, $to,
+            fn() => $currentBalance + $currentRecord - $newRecord,
+            fn() => $currentBalance + $currentRecord + $newRecord,
+            fn() => $currentBalance - $currentRecord - $newRecord,
+            fn() => $currentBalance - $currentRecord + $newRecord,
+
+        );
     }
 
     private function updateBalancePerDate(
@@ -108,5 +137,34 @@ class EditRecord
     }
 
 
+    private function updateBudget(Record $record, float $newAmount, RecordType $from, RecordType $to): void
+    {
+        //todo: support change in category
+        if ($record->budget || (!$record->budget && $to == RecordType::Expense)) {
+            $this->performTypeChange(
+                $from, $to,
+                function () use ($record, $newAmount) {
+                    $record->budget->update([
+                        'current_amount' => $record->budget->current_amount - $record->amount + $newAmount
+                    ]);
+                },
+                function () use ($record, $newAmount) {
+                    $record->budget()->update([
+                        'current_amount' => $record->budget->current_amount - $record->amount
+                    ]);
+                    $record->budget()->disassociate();
+                },
+                function () use ($record, $newAmount) {
+                    //todo: get budget id to associate
+                    $budget = Budget::linkedWith($record->wallet, $record->category)->first();
+                    $budget->update([
+                        'current_amount' => $budget->current_amount + $newAmount
+                    ]);
+                    $record->budget()->associate($budget);
+                },
+                null
+            );
+        }
+    }
 }
 

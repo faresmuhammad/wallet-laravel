@@ -45,6 +45,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public $timestamps = false;
 
     public function wallets(): HasMany
     {

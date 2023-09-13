@@ -15,13 +15,20 @@ class BudgetSeeder extends Seeder
     public function run(): void
     {
         $master = Budget::factory()->create([
-           'type' => BudgetType::Master->value,
-           'master_id' => null
+            'type' => BudgetType::Master->value,
+            'master_id' => null,
+            'target_amount' => 300,
+            'current_amount' => 0
         ]);
 
-        Budget::factory()->create([
-           'type' => BudgetType::Repeatable->value,
-           'master_id' => $master->id
+        $budget = Budget::factory()->create([
+            'type' => BudgetType::Repeatable->value,
+            'master_id' => $master->id,
+            'target_amount' => 300,
+            'current_amount' => 0
         ]);
+
+        $budget->wallets()->attach(1);
+        $budget->categories()->attach(1);
     }
 }
