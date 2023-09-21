@@ -101,6 +101,7 @@ class NewRecord
                'current_amount' => $budget->current_amount + $record->amount
             ]);
             $record->budget()->associate($budget);
+            $record->save();
         }
     }
 }

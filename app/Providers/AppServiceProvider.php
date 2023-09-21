@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\CreateNewBudget;
 use App\Services\CreateNewWallet;
 use App\Services\DeleteWallet;
 use Illuminate\Support\ServiceProvider;
@@ -22,5 +23,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(CreateNewWallet::class);
         $this->app->singleton(DeleteWallet::class);
+        $this->app->singleton(CreateNewBudget::class);
     }
 }

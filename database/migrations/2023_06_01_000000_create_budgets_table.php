@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('budgets', function (Blueprint $table) {
             $table->id();
-            $table->string('name',30)->unique();
+            $table->string('name',30);
             $table->double('target_amount');
             $table->double('current_amount')->default(0);
             $table->string('period');

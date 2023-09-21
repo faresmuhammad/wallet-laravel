@@ -33,6 +33,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('/records/{record}/update-record',[\App\Http\Controllers\API\V1\RecordController::class,'updateRecord']);
     Route::put('/records/{record}/update-transfer',[\App\Http\Controllers\API\V1\RecordController::class,'updateTransfer']);
+
+    Route::prefix('/budgets')->group(function (){
+        Route::get('/',[\App\Http\Controllers\API\V1\BudgetController::class,'index']);
+        Route::get('/{budget}',[\App\Http\Controllers\API\V1\BudgetController::class,'view']);
+        Route::post('/new',[\App\Http\Controllers\API\V1\BudgetController::class,'store']);
+        Route::put('/{budget}/update',[\App\Http\Controllers\API\V1\BudgetController::class,'update']);
+    });
 });
 
 Route::middleware('guest')->group(function () {

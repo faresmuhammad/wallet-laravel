@@ -62,6 +62,11 @@ class Budget extends Model
         return $query->where('type', 'Repeatable');
     }
 
+    public function scopeIsMaster(Builder $query): Builder
+    {
+        return $query->where('type', BudgetType::Master->value);
+    }
+
     public function scopeLinkedWith(Builder $query, Wallet $wallet, Category $category)
     {
         return $query->whereHas('wallets', function ($query) use ($wallet) {
