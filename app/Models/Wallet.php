@@ -12,9 +12,7 @@ class Wallet extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name', 'color', 'initial_balance', 'include_to_stats'
-    ];
+    protected $guarded = [];
 
     protected static function booted(): void
     {
@@ -25,13 +23,6 @@ class Wallet extends Model
                 $wallet->user_id = 1;
         });
 
-        static::created(function (Wallet $wallet) {
-            $wallet->balances()->create([
-                'value' => $wallet->initial_balance,
-                'wallet_id' => $wallet->id,
-                'currency_id' => 1
-            ]);
-        });
     }
 
     public function user(): BelongsTo
@@ -39,9 +30,14 @@ class Wallet extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function balances(): HasMany
+    public function strategy(): BelongsTo
     {
-        return $this->hasMany(Balance::class);
+        return $this->belongsTo(Strategy::class);
+    }
+
+    public function rule(): BelongsTo
+    {
+        return $this->belongsTo(StrategyRule::class);
     }
 
     public function records(): HasMany
@@ -52,6 +48,7 @@ class Wallet extends Model
     public function budgets(): BelongsToMany
     {
         return $this->belongsToMany(Budget::class, 'budget_wallet_pivot');
-
     }
+
+
 }

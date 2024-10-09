@@ -10,9 +10,9 @@ class BalancePerDate extends Model
     use HasFactory;
 
     protected $fillable = [
-        'value', 'date','wallet_id','balance_id'
+        'value', 'date','wallet_id'
     ];
 
-    protected $table = 'balances_per_date';
+    protected $table = 'balance_per_dates';
     public $timestamps = false;
 }

@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\DB;
 
 class RecordController extends Controller
 {
-
+    //todo: modify all methods
     public function index(Wallet $wallet)
     {
         $records = $wallet->records;

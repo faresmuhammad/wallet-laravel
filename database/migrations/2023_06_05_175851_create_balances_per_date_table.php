@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('balances_per_date', function (Blueprint $table) {
+        Schema::create('balance_per_dates', function (Blueprint $table) {
             $table->id();
             $table->double('value');
             $table->unsignedBigInteger('wallet_id');
