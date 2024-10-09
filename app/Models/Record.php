@@ -12,34 +12,19 @@ class Record extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'amount',
-        'description',
-        'type',
-        'balance_before',
-        'balance_after',
-        'balance_id',
-        'category_id',
-        'wallet_id',
-        'currency_id',
-        'date'
-    ];
+    protected $guarded = [];
 
     protected $casts = [
-        'date' => 'date',
+        'date' => 'datetime',
         'type' => RecordType::class
     ];
 
     public $timestamps = false;
 
-    public function wallet(): BelongsTo
-    {
-        return $this->belongsTo(Wallet::class);
-    }
 
-    public function currency(): BelongsTo
+    public function strategy(): BelongsTo
     {
-        return $this->belongsTo(Currency::class);
+        return $this->belongsTo(Strategy::class);
     }
 
     public function category(): BelongsTo
@@ -47,10 +32,6 @@ class Record extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function balance(): BelongsTo
-    {
-        return $this->belongsTo(Balance::class);
-    }
 
     public function transfer(): HasOne
     {

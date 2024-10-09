@@ -23,23 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::apiResource('/wallets', \App\Http\Controllers\API\V1\WalletController::class);
-    Route::prefix('/wallets/{wallet}')->group(function () {
-        Route::get('/records', [\App\Http\Controllers\API\V1\RecordController::class, 'index']);
-        Route::post('/pay', [\App\Http\Controllers\API\V1\RecordController::class, 'pay']);
-        Route::post('/topup', [\App\Http\Controllers\API\V1\RecordController::class, 'topup']);
-        Route::post('/transfer', [\App\Http\Controllers\API\V1\RecordController::class, 'transfer']);
-    });
 
-    Route::put('/records/{record}/update-record',[\App\Http\Controllers\API\V1\RecordController::class,'updateRecord']);
-    Route::put('/records/{record}/update-transfer',[\App\Http\Controllers\API\V1\RecordController::class,'updateTransfer']);
-
-    Route::prefix('/budgets')->group(function (){
-        Route::get('/',[\App\Http\Controllers\API\V1\BudgetController::class,'index']);
-        Route::get('/{budget}',[\App\Http\Controllers\API\V1\BudgetController::class,'view']);
-        Route::post('/new',[\App\Http\Controllers\API\V1\BudgetController::class,'store']);
-        Route::put('/{budget}/update',[\App\Http\Controllers\API\V1\BudgetController::class,'update']);
-    });
 });
 
 Route::middleware('guest')->group(function () {
@@ -51,6 +35,3 @@ Route::middleware('guest')->group(function () {
 
 });
 
-
-Route::middleware('auth:sanctum')->group(function () {
-});

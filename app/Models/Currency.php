@@ -21,10 +21,6 @@ class Currency extends Model
     ];
 
 
-    public function balances()
-    {
-        return $this->hasMany(Balance::class);
-    }
 
     public function records()
     {

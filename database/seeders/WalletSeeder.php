@@ -13,11 +13,11 @@ class WalletSeeder extends Seeder
      */
     public function run(): void
     {
-        Wallet::factory()->create([
-            'name' => 'Cash',
-            'color' => '#009912',
-            'initial_balance' => 1000.0,
-            'user_id' => 1
-        ]);
+//        Wallet::factory()->create([
+//            'name' => 'Cash',
+//            'color' => '#009912',
+//            'initial_balance' => 1000.0,
+//            'user_id' => 1
+//        ]);
     }
 }

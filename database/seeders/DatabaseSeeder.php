@@ -18,14 +18,14 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name'=>'Fares Muhammad',
             'password' => Hash::make('123456'),
-            'email' => 'fares.muhammad210@gmail.com'
+            'email' => 'test@example.com',
         ]);
 
         $this->call([
             CurrencySeeder::class,
             WalletSeeder::class,
             CategorySeeder::class,
-            BudgetSeeder::class
+//            BudgetSeeder::class
         ]);
     }
 }
