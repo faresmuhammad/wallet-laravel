@@ -35,10 +35,6 @@ class Wallet extends Model
         return $this->belongsTo(Strategy::class);
     }
 
-    public function rule(): BelongsTo
-    {
-        return $this->belongsTo(StrategyRule::class);
-    }
 
     public function records(): HasMany
     {
