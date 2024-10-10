@@ -4,6 +4,7 @@ use App\Http\Controllers\API\V1\Auth\ForgotPasswordApiController;
 use App\Http\Controllers\API\V1\Auth\LoginApiController;
 use App\Http\Controllers\API\V1\Auth\RegisterApiController;
 use App\Http\Controllers\API\V1\Auth\ResetPasswordApiController;
+use App\Http\Controllers\API\V1\StrategyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,11 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    Route::controller(StrategyController::class)->group(function () {
+        Route::post('/strategies', 'store');
+        Route::put('/strategies/{strategy}', 'updateName');
+        Route::post('/strategies/{strategy}/activate', 'activateStrategy');
+    });
 
 });
 

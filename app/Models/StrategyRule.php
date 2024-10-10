@@ -19,9 +19,4 @@ class StrategyRule extends Model
     {
         return $this->belongsTo(Strategy::class);
     }
-
-    public function wallets(): HasMany
-    {
-        return $this->hasMany(Wallet::class);
-    }
 }

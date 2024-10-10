@@ -41,7 +41,7 @@ return new class extends Migration {
             $table->dropColumn(['sender_balance','receiver_balance']);
         });
 
-        Schema::table('balances_per_date', function (Blueprint $table) {
+        Schema::table('balance_per_dates', function (Blueprint $table) {
             $table->dropConstrainedForeignId('balance_id');
         });
         /**
@@ -74,7 +74,6 @@ return new class extends Migration {
          */
         Schema::table('wallets', function (Blueprint $table) {
            $table->foreignId('strategy_id')->references('id')->on('strategies');
-           $table->foreignId('rule_id')->references('id')->on('rules');
         });
 
         /**

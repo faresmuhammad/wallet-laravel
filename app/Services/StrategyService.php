@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class StrategyService
 {
 
-    public function createStrategy(Request $request)
+    public function createStrategy(Request $request): Strategy
     {
         return Strategy::create([
             'name' => $request->name,
@@ -19,7 +19,7 @@ class StrategyService
         ]);
     }
 
-    public function updateStrategyName(string $name, Strategy $strategy)
+    public function updateStrategyName(string $name, Strategy $strategy): Strategy
     {
         $strategy->update([
             'name' => $name,
@@ -30,13 +30,13 @@ class StrategyService
     public function activateStrategy(Strategy $strategy)
     {
         //if there is no rules for the strategy return
-        if ($strategy->rules()->count() == 0) return;
+        if ($strategy->rules()->count() == 0) return response()->json(['message' => 'Can not activate without rules']);
         DB::transaction(function () use ($strategy) {
             //get the rules
             $rules = $strategy->rules;
             //create wallets on top of rules
             foreach ($rules as $rule) {
-                $rule->wallets()->create([
+                Wallet::create([
                     'strategy_id' => $strategy->id,
                     'name' => $rule->name,
                     'user_id' => auth()->id(),
