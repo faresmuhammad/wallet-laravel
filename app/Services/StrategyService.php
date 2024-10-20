@@ -31,25 +31,28 @@ class StrategyService
     {
         //if there is no rules for the strategy return
         if ($strategy->rules()->count() == 0) return response()->json(['message' => 'Can not activate without rules']);
-        DB::transaction(function () use ($strategy) {
+        if ($strategy->activated) return response()->json(['message' => 'Strategy is already activated']);
+        $wallets = [];
+        DB::transaction(function () use ($strategy, &$wallets) {
             //get the rules
             $rules = $strategy->rules;
             //create wallets on top of rules
             foreach ($rules as $rule) {
-                Wallet::create([
+                $wallet = Wallet::create([
                     'strategy_id' => $strategy->id,
                     'name' => $rule->name,
                     'user_id' => auth()->id(),
                     'balance' => $rule->initial_balance,
                     'currency_id' => $rule->currency_id,
                 ]);
+                $wallets[] = $wallet->name;
             }
             //mark the strategy as activated
             $strategy->update([
                 'activated' => true
             ]);
         });
-
+        return response()->json(['message' => 'Strategy activated by creating these wallets successfully: ' . implode(', ', $wallets)]);
     }
 
     public function migrateToStrategy()

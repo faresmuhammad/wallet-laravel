@@ -34,6 +34,6 @@ class StrategyController extends Controller
 
     public function activateStrategy(Strategy $strategy)
     {
-        $this->service->activateStrategy($strategy);
+        return $this->service->activateStrategy($strategy);
     }
 }
