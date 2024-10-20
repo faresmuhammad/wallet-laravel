@@ -83,12 +83,13 @@ class StrategyAndRuleTest extends TestCase
             'currency_id' => $currency->id,
         ]);
 
-        $this->post("/api/strategies/{$strategy->id}/activate", []);
+        $response = $this->post("/api/strategies/{$strategy->id}/activate", []);
 
         $this->assertDatabaseHas('wallets', ['name' => 'Liabilities']);
         $this->assertDatabaseHas('wallets', ['name' => 'Spending']);
         $this->assertDatabaseHas('wallets', ['name' => 'Saving']);
         $this->assertDatabaseHas('strategies', ['name' => 'test', 'activated' => true]);
+        $response->assertJsonFragment(['message' => 'Strategy activated by creating these wallets successfully: Liabilities, Spending, Saving']);
     }
 
     public function test_that_activating_strategy_without_rules_will_return_error(): void
@@ -111,7 +112,6 @@ class StrategyAndRuleTest extends TestCase
         $response = $this->post("/api/strategies/{$strategy->id}/activate", []);
 
         $this->assertDatabaseHas('strategies', ['name' => 'test', 'activated' => false]);
-//        $response->assertJson(['message' => 'Can not activate without rules']);
         $response->assertJsonFragment(['message' => 'Can not activate without rules']);
     }
 }
