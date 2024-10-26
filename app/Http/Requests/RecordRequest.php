@@ -24,11 +24,10 @@ class RecordRequest extends FormRequest
     {
         return [
             'amount' => 'numeric',
-            'description' => 'nullable|string',
-            'balance_id' => 'integer',
-            'category_id' => 'integer',
-            'wallet_id' => 'integer',
-            'currency_id' => 'integer',
+            'name' => 'nullable|string',
+            'category_id' => 'integer|nullable',
+            'strategy_id' => 'required|integer',
+            'budget_id' => 'nullable|integer',
             'date' => 'date|nullable',
             'type' => 'nullable|in:Expense,Income'
         ];

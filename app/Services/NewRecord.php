@@ -8,6 +8,8 @@ use App\Models\Balance;
 use App\Models\BalancePerDate;
 use App\Models\Budget;
 use App\Models\Record;
+use App\Models\Strategy;
+use App\Models\StrategyRule;
 use App\Models\Wallet;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -18,26 +20,45 @@ class NewRecord
 
     public function pay(Wallet $wallet, RecordRequest $request): JsonResponse
     {
-        return $this->record($wallet, RecordType::Expense, $request);
+        $record = $wallet->records()->create($request->safe()->except('type') + ['type' => RecordType::Expense]);
+        $wallet->update([
+            'balance' => $wallet->balance - $record->amount,
+        ]);
+        return apiResponse(true, 'Record created!', $record);
     }
 
-    public function topup(Wallet $wallet, RecordRequest $request): JsonResponse
+    public function topup(?Wallet $wallet, RecordRequest $request): JsonResponse
     {
-        return $this->record($wallet, RecordType::Income, $request);
+        DB::beginTransaction();
+        //add the amount directly to wallet balance
+        if ($wallet) {
+        }
+        $activeStrategy = Strategy::isActive()->first();
+        Record::create($request->validated());
+        $this->calculateUponRules($request->amount, $activeStrategy->rules);
+        DB::commit();
+        return apiResponse(true, 'Record created!');
     }
 
+    /**
+     * @param float $amount
+     * @param StrategyRule[] $rules
+     * @return void
+     */
+    private function calculateUponRules(float $amount, $rules)
+    {
+        foreach ($rules as $rule) {
+            $calculatedAmount = $amount * $rule->ratio;
+            $rule->wallet()->update([
+                'balance' => $rule->wallet->balance + $calculatedAmount,
+            ]);
+        }
+
+    }
 
     private function record(Wallet $wallet, RecordType $type, RecordRequest $request): JsonResponse
     {
         /*
-         * save the record
-         * update balance
-         * update balance per date
-         * set balance after of the record
-         *
-         * ** Budget Updates ** works only on pay method
-         * check the selected category and the selected wallet if they are linked with a budget
-         * perform budget calculations
          *
          */
         DB::transaction(function () use ($type, $wallet, $request) {
@@ -98,7 +119,7 @@ class NewRecord
         $budget = Budget::linkedWith($record->wallet, $record->category)->first();
         if ($budget) {
             $budget->update([
-               'current_amount' => $budget->current_amount + $record->amount
+                'current_amount' => $budget->current_amount + $record->amount
             ]);
             $record->budget()->associate($budget);
             $record->save();

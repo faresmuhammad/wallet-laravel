@@ -44,6 +44,7 @@ class StrategyService
                     'user_id' => auth()->id(),
                     'balance' => $rule->initial_balance,
                     'currency_id' => $rule->currency_id,
+                    'rule_id' => $rule->id,
                 ]);
                 $wallets[] = $wallet->name;
             }

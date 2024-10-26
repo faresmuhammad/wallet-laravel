@@ -26,4 +26,9 @@ class Strategy extends Model
     {
         return $this->hasMany(StrategyRule::class);
     }
+
+    public function scopeIsActive($query)
+    {
+        return $query->where('activated', true);
+    }
 }

@@ -74,6 +74,7 @@ return new class extends Migration {
          */
         Schema::table('wallets', function (Blueprint $table) {
            $table->foreignId('strategy_id')->references('id')->on('strategies');
+           $table->foreignId('rule_id')->references('id')->on('rules');
         });
 
         /**
