@@ -4,6 +4,7 @@ use App\Http\Controllers\API\V1\Auth\ForgotPasswordApiController;
 use App\Http\Controllers\API\V1\Auth\LoginApiController;
 use App\Http\Controllers\API\V1\Auth\RegisterApiController;
 use App\Http\Controllers\API\V1\Auth\ResetPasswordApiController;
+use App\Http\Controllers\API\V1\RecordController;
 use App\Http\Controllers\API\V1\StrategyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/strategies/{strategy}/activate', 'activateStrategy');
     });
 
+    Route::controller(RecordController::class)->group(function () {
+        Route::post('/pay/{wallet}', 'pay');
+        Route::post('/topup/{wallet?}', 'topup');
+    });
 });
 
 Route::middleware('guest')->group(function () {

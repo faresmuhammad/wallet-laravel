@@ -35,7 +35,7 @@ class RecordController extends Controller
         return $service->pay($wallet, $request);
     }
 
-    public function topup(Wallet $wallet, NewRecord $service, RecordRequest $request)
+    public function topup(?Wallet $wallet, NewRecord $service, RecordRequest $request)
     {
         return $service->topup($wallet, $request);
     }
