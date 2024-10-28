@@ -29,7 +29,6 @@ class RecordRequest extends FormRequest
             'strategy_id' => 'required|integer',
             'budget_id' => 'nullable|integer',
             'date' => 'date|nullable',
-            'type' => 'nullable|in:Expense,Income'
         ];
     }
 }

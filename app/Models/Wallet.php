@@ -40,11 +40,6 @@ class Wallet extends Model
         return $this->belongsTo(StrategyRule::class,'rule_id');
     }
 
-    public function records(): HasMany
-    {
-        return $this->hasMany(Record::class);
-    }
-
     public function budgets(): BelongsToMany
     {
         return $this->belongsToMany(Budget::class, 'budget_wallet_pivot');

@@ -3,49 +3,76 @@
 namespace App\Services;
 
 use App\Enums\RecordType;
-use App\Http\Requests\RecordRequest;
-use App\Models\Balance;
-use App\Models\BalancePerDate;
-use App\Models\Budget;
+use App\Http\Resources\RecordResource;
 use App\Models\Record;
 use App\Models\Strategy;
-use App\Models\StrategyRule;
 use App\Models\Wallet;
-use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class NewRecord
 {
 
-    public function pay(Wallet $wallet, RecordRequest $request): JsonResponse
+    public function pay(Wallet $wallet, Request $request): JsonResponse
     {
-        $record = $wallet->records()->create($request->safe()->except('type') + ['type' => RecordType::Expense]);
+        //get the proper rule to apply the record on
+        //update the rule's wallet balance
+        $record = Record::create([
+            'amount' => $request->amount,
+            'name' => $request->name,
+//            'type' => RecordType::Expense
+        ]);
         $wallet->update([
             'balance' => $wallet->balance - $record->amount,
         ]);
-        return apiResponse(true, 'Record created!', $record);
+        return apiResponse('Record created!', $record, status: 201);
     }
 
-    public function topup(?Wallet $wallet, RecordRequest $request): JsonResponse
+    public function topup(?int $walletId, Request $request): JsonResponse
     {
+        //todo: update balance per date
         DB::beginTransaction();
-        //add the amount directly to wallet balance
-        if ($wallet) {
+        if ($walletId) {
+            $wallet = Wallet::find($walletId);
+            $record = Record::create([
+                'amount' => $request->amount,
+                'name' => $request->name ?? 'No Name',
+                'category_id' => $request->category_id,
+                'strategy_id' => $wallet->strategy->id,
+                'date' => now(),
+                'type' => RecordType::Income
+            ]);
+            $wallet->update([
+                'balance' => $wallet->balance + $record->amount,
+            ]);
+            DB::commit();
+            return apiResponse('Record created!', new RecordResource($record), status: 201);
         }
         $activeStrategy = Strategy::isActive()->first();
-        Record::create($request->validated());
+
+        if (is_null($activeStrategy)) return apiResponse('Strategy not activated!', status: 404);
+
+        $record = Record::create([
+            'amount' => $request->amount,
+            'name' => $request->name ?? 'No Name',
+            'category_id' => $request->category_id,
+            'strategy_id' => $activeStrategy->id,
+            'date' => now(),
+            'type' => RecordType::Income
+        ]);
         $this->calculateUponRules($request->amount, $activeStrategy->rules);
         DB::commit();
-        return apiResponse(true, 'Record created!');
+        return apiResponse('Record created!', new RecordResource($record), status: 201);
+
     }
 
     /**
      * @param float $amount
-     * @param StrategyRule[] $rules
+     * @param $rules
      * @return void
      */
-    private function calculateUponRules(float $amount, $rules)
+    private function calculateUponRules(float $amount, $rules): void
     {
         foreach ($rules as $rule) {
             $calculatedAmount = $amount * $rule->ratio;
@@ -56,73 +83,5 @@ class NewRecord
 
     }
 
-    private function record(Wallet $wallet, RecordType $type, RecordRequest $request): JsonResponse
-    {
-        /*
-         *
-         */
-        DB::transaction(function () use ($type, $wallet, $request) {
-            $balance = Balance::find($request->balance_id);
-            $record = new Record(
-                $request->validated()
-                + ['balance_before' => $balance->value]
-            );
-            switch ($type) {
-                case RecordType::Expense:
-                    $record->type = RecordType::Expense->name;
-                    $balance->update([
-                        'value' => $balance->value - $record->amount
-                    ]);
-                    $this->triggerBudget($record);
-                    break;
 
-                case RecordType::Income:
-                    $record->type = RecordType::Income->name;
-                    $balance->update([
-                        'value' => $balance->value + $record->amount
-                    ]);
-                    break;
-
-                default:
-                    throw new Exception('Record type is not available');
-            }
-
-            $record->balance_after = $balance->value;
-            $record->save();
-
-            BalancePerDate::updateOrCreate(
-            //Fields to search for
-                ['date' => today()],
-                //Fields to update
-                [
-                    'value' => $balance->value,
-                    'wallet_id' => $wallet->id,
-                    'balance_id' => $balance->id
-                ]
-            );
-        });
-        return new JsonResponse([
-            'status' => 'Successful',
-            'message' => 'Your record is successfully inserted'
-        ], 201);
-    }
-
-
-    /**
-     * @throws Exception
-     */
-    private function triggerBudget(Record $record): void
-    {
-        if ($record->type != RecordType::Expense)
-            throw new Exception('Budget only can be triggered by expense records');
-
-        $budget = Budget::linkedWith($record->wallet, $record->category)->first();
-        if ($budget) {
-            $budget->update([
-                'current_amount' => $budget->current_amount + $record->amount
-            ]);
-            $record->budget()->associate($budget);
-            $record->save();
-        }
-    }
 }
