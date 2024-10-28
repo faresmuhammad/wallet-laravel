@@ -35,24 +35,25 @@ class RecordController extends Controller
         return $service->pay($wallet, $request);
     }
 
-    public function topup(?Wallet $wallet, NewRecord $service, RecordRequest $request)
+    public function topup(NewRecord $service, Request $request, ?int $walletId = null)
     {
-        return $service->topup($wallet, $request);
+        return $service->topup($walletId, $request);
     }
 
-    public function transfer(Wallet $wallet, TransferRecord $service,TransferRecordRequest $request)
+    public function transfer(Wallet $wallet, TransferRecord $service, TransferRecordRequest $request)
     {
-        return $service->transfer($wallet,$request);
+        return $service->transfer($wallet, $request);
     }
 
 
     public function updateRecord(Record $record, EditRecord $service, RecordRequest $request)
     {
-        return $service->editRecord($record,$request);
+        return $service->editRecord($record, $request);
     }
+
     public function updateTransfer(Record $record, EditTransfer $service, TransferRecordRequest $request)
     {
-        return $service->editTransferRecord($record,$request);
+        return $service->editTransferRecord($record, $request);
     }
 
 
