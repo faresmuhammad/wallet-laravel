@@ -23,6 +23,6 @@ class StrategyRule extends Model
 
     public function wallet(): HasOne
     {
-        return $this->hasOne(Wallet::class,'rule_id');
+        return $this->hasOne(Wallet::class, 'rule_id');
     }
 }

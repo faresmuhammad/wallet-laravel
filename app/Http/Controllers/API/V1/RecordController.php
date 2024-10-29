@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Enums\RecordType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PayRequest;
 use App\Http\Requests\RecordRequest;
 use App\Http\Requests\TransferRecordRequest;
 use App\Http\Resources\RecordResource;
@@ -30,7 +31,7 @@ class RecordController extends Controller
         return RecordResource::collection($records);
     }
 
-    public function pay(Wallet $wallet, NewRecord $service, RecordRequest $request)
+    public function pay(Wallet $wallet, NewRecord $service, PayRequest $request)
     {
         return $service->pay($wallet, $request);
     }

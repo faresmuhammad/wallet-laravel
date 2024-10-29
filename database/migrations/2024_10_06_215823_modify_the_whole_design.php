@@ -82,6 +82,7 @@ return new class extends Migration {
          */
         Schema::table('records', function (Blueprint $table) {
            $table->foreignId('strategy_id')->references('id')->on('strategies');
+           $table->foreignId('related_to')->nullable()->references('id')->on('wallets');
         });
 
 

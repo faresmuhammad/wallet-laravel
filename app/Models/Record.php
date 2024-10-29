@@ -42,4 +42,9 @@ class Record extends Model
     {
         return $this->belongsTo(Budget::class);
     }
+
+    public function relatedWallet(): BelongsTo
+    {
+        return $this->belongsTo(Wallet::class, 'related_to');
+    }
 }
