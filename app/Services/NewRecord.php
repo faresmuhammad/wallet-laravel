@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\RecordType;
+use App\Http\Requests\PayRequest;
 use App\Http\Resources\RecordResource;
 use App\Models\Record;
 use App\Models\Strategy;
@@ -14,19 +15,22 @@ use Illuminate\Support\Facades\DB;
 class NewRecord
 {
 
-    public function pay(Wallet $wallet, Request $request): JsonResponse
+    public function pay(Wallet $wallet, PayRequest $request): JsonResponse
     {
         //get the proper rule to apply the record on
         //update the rule's wallet balance
-        $record = Record::create([
-            'amount' => $request->amount,
-            'name' => $request->name,
-//            'type' => RecordType::Expense
-        ]);
+        $record = $wallet->records()->create(
+            $request->validated() +
+            [
+                'type' => RecordType::Expense,
+                'strategy_id' => $wallet->strategy_id,
+                'date' => now(),
+            ]
+        );
         $wallet->update([
             'balance' => $wallet->balance - $record->amount,
         ]);
-        return apiResponse('Record created!', $record, status: 201);
+        return apiResponse('Record created!', new RecordResource($record), status: 201);
     }
 
     public function topup(?int $walletId, Request $request): JsonResponse
@@ -35,7 +39,7 @@ class NewRecord
         DB::beginTransaction();
         if ($walletId) {
             $wallet = Wallet::find($walletId);
-            $record = Record::create([
+            $record = $wallet->records()->create([
                 'amount' => $request->amount,
                 'name' => $request->name ?? 'No Name',
                 'category_id' => $request->category_id,

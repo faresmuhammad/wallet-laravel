@@ -46,4 +46,8 @@ class Wallet extends Model
     }
 
 
+    public function records(): HasMany
+    {
+        return $this->hasMany(Record::class,'related_to');
+    }
 }
