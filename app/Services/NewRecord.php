@@ -19,6 +19,7 @@ class NewRecord
     {
         //get the proper rule to apply the record on
         //update the rule's wallet balance
+        DB::beginTransaction();
         $record = $wallet->records()->create(
             $request->validated() +
             [
@@ -30,6 +31,7 @@ class NewRecord
         $wallet->update([
             'balance' => $wallet->balance - $record->amount,
         ]);
+        DB::commit();
         return apiResponse('Record created!', new RecordResource($record), status: 201);
     }
 
