@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\RecordType;
+use App\Exceptions\TypeConversionException;
 use App\Http\Requests\UpdateRecordRequest;
 use App\Http\Requests\TransferRecordRequest;
 use App\Http\Resources\RecordUpdatedResource;
@@ -44,6 +45,9 @@ class EditRecord
     }
 
 
+    /**
+     * @throws TypeConversionException
+     */
     private function updateBalance(
         Record     $record,
         float      $newAmount,
@@ -52,14 +56,30 @@ class EditRecord
     ): void
     {
         $wallet = $record->relatedWallet;
-        $wallet->update([
-            'balance' => $this->updatedValue(
-                currentBalance: $wallet->balance,
-                currentRecord: $record->amount,
-                newRecord: $newAmount,
-                from: $from, to: $to
-            )
-        ]);
+        if ($wallet) {
+            $wallet->update([
+                'balance' => $this->updatedValue(
+                    currentBalance: $wallet->balance,
+                    currentRecord: $record->amount,
+                    newRecord: $newAmount,
+                    from: $from, to: $to
+                )
+            ]);
+        } else {
+            //wallet is null means that this record operated by strategy rules
+            $rules = $record->strategy->rules;
+            foreach ($rules as $rule) {
+                $rule->wallet()->update([
+                    'balance' => $this->updatedValueForNonWalletRecord(
+                        currentBalance: $rule->wallet->balance,
+                        currentRecord: $record->amount * $rule->ratio,
+                        newRecord: $newAmount * $rule->ratio,
+                        from: $from, to: $to
+                    )
+                ]);
+            }
+        }
+
     }
 
 
@@ -91,11 +111,27 @@ class EditRecord
     {
         return $this->performTypeChange(
             $from, $to,
-            fn() => $currentBalance + $currentRecord - $newRecord,
-            fn() => $currentBalance + $currentRecord + $newRecord,
-            fn() => $currentBalance - $currentRecord - $newRecord,
-            fn() => $currentBalance - $currentRecord + $newRecord,
+            expenseToExpense: fn() => $currentBalance + $currentRecord - $newRecord,
+            expenseToIncome: fn() => $currentBalance + $currentRecord + $newRecord,
+            incomeToExpense: fn() => $currentBalance - $currentRecord - $newRecord,
+            incomeToIncome: fn() => $currentBalance - $currentRecord + $newRecord,
 
+        );
+    }
+
+    private function updatedValueForNonWalletRecord(
+        float      $currentBalance,
+        float      $currentRecord,
+        float      $newRecord,
+        RecordType $from, RecordType $to
+    )
+    {
+        return $this->performTypeChange(
+            $from, $to,
+            expenseToExpense: fn() => $this->typeConversionErrorException("This is originally an income record that the active strategy applied its rules on it so it can't be an expense record."),
+            expenseToIncome: fn() => $this->typeConversionErrorException("This is originally an income record that the active strategy applied its rules on it so it can't be an expense record."),
+            incomeToExpense: fn() => $this->typeConversionErrorException("Strategy Rules has been applied on this record so it can't be converted to an expense."),
+            incomeToIncome: fn() => $currentBalance - $currentRecord + $newRecord,
         );
     }
 
@@ -142,6 +178,11 @@ class EditRecord
                 null
             );
         }
+    }
+
+    private function typeConversionErrorException($message): TypeConversionException
+    {
+        throw new TypeConversionException(apiResponse("Record Type Conversion Error", [], [$message], 400));
     }
 }
 
