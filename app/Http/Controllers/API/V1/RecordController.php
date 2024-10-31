@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Enums\RecordType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PayRequest;
-use App\Http\Requests\RecordRequest;
+use App\Http\Requests\UpdateRecordRequest;
 use App\Http\Requests\TransferRecordRequest;
 use App\Http\Resources\RecordResource;
 use App\Models\Balance;
@@ -47,7 +47,7 @@ class RecordController extends Controller
     }
 
 
-    public function updateRecord(Record $record, EditRecord $service, RecordRequest $request)
+    public function updateRecord(Record $record, EditRecord $service, UpdateRecordRequest $request)
     {
         return $service->editRecord($record, $request);
     }

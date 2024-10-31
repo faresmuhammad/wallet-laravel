@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RecordRequest extends FormRequest
+class UpdateRecordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,9 +26,8 @@ class RecordRequest extends FormRequest
             'amount' => 'numeric',
             'name' => 'nullable|string',
             'category_id' => 'integer|nullable',
-            'strategy_id' => 'required|integer',
-            'budget_id' => 'nullable|integer',
-            'date' => 'date|nullable',
+            'date' => 'datetime',
+            'type' => 'string|in:Income,Expense,Transfer',
         ];
     }
 }

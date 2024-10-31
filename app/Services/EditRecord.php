@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\Enums\RecordType;
-use App\Http\Requests\RecordRequest;
+use App\Http\Requests\UpdateRecordRequest;
 use App\Http\Requests\TransferRecordRequest;
+use App\Http\Resources\RecordUpdatedResource;
 use App\Models\Balance;
 use App\Models\BalancePerDate;
 use App\Models\Budget;
@@ -15,13 +16,13 @@ use Illuminate\Support\Facades\DB;
 class EditRecord
 {
 
-    public function editRecord(Record $record, RecordRequest $request): JsonResponse
+    public function editRecord(Record $record, UpdateRecordRequest $request): JsonResponse
     {
         /*
-         * update the balance
+         * update the related wallet balance
          * update the record
-         * update balance per date
-         * ** Budget Updates **
+         * todo: update balance per date
+         * ** Budget Updates ** -> todo
          * check the updated record category and wallet
          * update the value if the updated record is still an expense record
          * perform the budget calculations if it is changed to expense
@@ -30,43 +31,18 @@ class EditRecord
         $this->updateBalance(
             $record,
             $request->amount,
-            $record->type,
-            RecordType::from($request->type)
+            from: $record->type,
+            to: $request->type ? RecordType::from($request->type) : $record->type
         );
 
+        $record->update($request->validated());
 
-        $this->updateBudget(
-            $record,
-            $request->amount,
-            $record->type,
-            RecordType::from($request->type)
-        );
-        $this->updateRecord($record, $request);
-        $this->updateBalancePerDate($record);
+        //todo: update balance per date
         DB::commit();
 
-        return new JsonResponse([
-            'status' => 'Successful',
-            'message' => 'Your Record has been updated successfully'
-        ]);
+        return apiResponse('Record Updated Successfully', new RecordUpdatedResource($record));
     }
 
-
-    private function updateRecord(
-        Record        $record,
-        RecordRequest $request,
-    ): void
-    {
-        $record->update(
-            $request->except(['balance_id', 'wallet_id', 'currency_id']) +
-            [
-                'balance_id' => $record->balance->id,
-                'wallet_id' => $record->wallet->id,
-                'currency_id' => $record->currency->id,
-                'balance_after' => $record->balance->value
-            ]
-        );
-    }
 
     private function updateBalance(
         Record     $record,
@@ -75,9 +51,10 @@ class EditRecord
         RecordType $to,
     ): void
     {
-        $record->balance->update([
-            'value' => $this->updatedValue(
-                currentBalance: $record->balance->value,
+        $wallet = $record->relatedWallet;
+        $wallet->update([
+            'balance' => $this->updatedValue(
+                currentBalance: $wallet->balance,
                 currentRecord: $record->amount,
                 newRecord: $newAmount,
                 from: $from, to: $to
