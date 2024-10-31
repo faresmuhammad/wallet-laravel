@@ -16,10 +16,11 @@ class RecordResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'amount' => $this->amount,
             'name' => $this->name,
             'type' => $this->type,
-            'date' => Carbon::parse($this->date)->format('Y-m-d'),
+            'date' => formatDate($this->date),
             'category' => new CategoryResource($this->category),
         ];
     }
