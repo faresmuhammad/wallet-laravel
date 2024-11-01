@@ -18,38 +18,44 @@ use App\Models\Wallet;
 use App\Services\EditRecord;
 use App\Services\EditTransfer;
 use App\Services\NewRecord;
-use App\Services\TransferRecord;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class RecordController extends Controller
 {
-    //todo: modify all methods
+    public function __construct(private NewRecord $createService, private EditRecord $updateService)
+    {
+    }
+
     public function index(Wallet $wallet)
     {
         $records = $wallet->records;
         return RecordResource::collection($records);
     }
 
-    public function pay(Wallet $wallet, NewRecord $service, PayRequest $request)
+    public function pay(Wallet $wallet, PayRequest $request): JsonResponse
     {
-        return $service->pay($wallet, $request);
+        return $this->createService->pay($wallet, $request);
     }
 
-    public function topup(NewRecord $service, Request $request, ?int $walletId = null)
+    public function topup(Request $request, ?int $walletId = null): JsonResponse
     {
-        return $service->topup($walletId, $request);
+        return $this->createService->topup($walletId, $request);
     }
 
-    public function transfer(Wallet $wallet, TransferRecord $service, TransferRecordRequest $request)
+    /**
+     * @throws \Throwable
+     */
+    public function transfer(TransferRecordRequest $request): JsonResponse
     {
-        return $service->transfer($wallet, $request);
+        return $this->createService->transfer($request);
     }
 
 
-    public function updateRecord(Record $record, EditRecord $service, UpdateRecordRequest $request)
+    public function updateRecord(Record $record, UpdateRecordRequest $request)
     {
-        return $service->editRecord($record, $request);
+        return $this->updateService->editRecord($record, $request);
     }
 
     public function updateTransfer(Record $record, EditTransfer $service, TransferRecordRequest $request)

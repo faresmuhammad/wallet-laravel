@@ -23,10 +23,10 @@ class TransferRecordRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => 'string',
             'sender_wallet' => 'integer',
             'receiver_wallet' => 'integer',
             'amount' => 'numeric',
-            'currency_id' => 'integer',
             'date' => 'date|nullable'
         ];
     }

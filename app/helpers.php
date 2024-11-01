@@ -12,7 +12,7 @@ function apiResponse($message, array|object $data = [], array|object $errors = [
     ], $status);
 }
 
-function formatDate($date, $format = 'Y-m-d'): string
+function formatDate($date, $format = 'Y-m-d h:i A'): string
 {
     return \Carbon\Carbon::parse($date)->format($format);
 }
