@@ -25,6 +25,15 @@ class PayRequest extends FormRequest
             'amount' => 'required|numeric',
             'name' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'date' => 'nullable|date',
         ];
     }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+           'date' => $this->date ?? now()
+        ]);
+    }
+
 }

@@ -11,7 +11,7 @@ class Transfer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'amount', 'record_id','sender_wallet','receiver_wallet'
+        'amount', 'record_id', 'sender_wallet', 'receiver_wallet'
     ];
 
     public $timestamps = false;
@@ -19,5 +19,15 @@ class Transfer extends Model
     public function record(): BelongsTo
     {
         return $this->belongsTo(Record::class);
+    }
+
+    public function senderWallet(): BelongsTo
+    {
+        return $this->belongsTo(Wallet::class, 'sender_wallet');
+    }
+
+    public function receiverWallet(): BelongsTo
+    {
+        return $this->belongsTo(Wallet::class, 'receiver_wallet');
     }
 }

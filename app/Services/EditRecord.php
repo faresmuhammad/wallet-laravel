@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\RecordType;
-use App\Exceptions\TypeConversionException;
 use App\Http\Requests\UpdateRecordRequest;
 use App\Http\Requests\TransferRecordRequest;
 use App\Http\Resources\RecordUpdatedResource;
@@ -11,6 +10,7 @@ use App\Models\Balance;
 use App\Models\BalancePerDate;
 use App\Models\Budget;
 use App\Models\Record;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -20,9 +20,6 @@ class EditRecord
     public function editRecord(Record $record, UpdateRecordRequest $request): JsonResponse
     {
         /*
-         * update the related wallet balance
-         * update the record
-         * todo: update balance per date
          * ** Budget Updates ** -> todo
          * check the updated record category and wallet
          * update the value if the updated record is still an expense record
@@ -46,7 +43,7 @@ class EditRecord
 
 
     /**
-     * @throws TypeConversionException
+     * @throws HttpResponseException
      */
     private function updateBalance(
         Record     $record,
@@ -180,9 +177,9 @@ class EditRecord
         }
     }
 
-    private function typeConversionErrorException($message): TypeConversionException
+    private function typeConversionErrorException($message): HttpResponseException
     {
-        throw new TypeConversionException(apiResponse("Record Type Conversion Error", [], [$message], 400));
+        throw new HttpResponseException(apiResponse("Record Type Conversion Error", [], [$message], 400));
     }
 }
 
