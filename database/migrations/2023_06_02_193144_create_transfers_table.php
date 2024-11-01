@@ -17,8 +17,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('receiver_balance');
             $table->unsignedBigInteger('receiver_wallet');
             $table->double('amount');
+            $table->dateTime('date')->default(now());
             $table->unsignedBigInteger('record_id')->unique();
-            $table->timestamps();
 
             $table->foreign('record_id')->references('id')
                 ->on('records')
