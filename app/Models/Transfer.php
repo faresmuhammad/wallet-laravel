@@ -14,6 +14,7 @@ class Transfer extends Model
         'amount', 'record_id','sender_wallet','receiver_wallet'
     ];
 
+    public $timestamps = false;
 
     public function record(): BelongsTo
     {
