@@ -15,6 +15,7 @@ class TransferResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->record->id,
             'name' => $this->record->name,
             'amount' => $this->amount,
             'senderWallet' => [

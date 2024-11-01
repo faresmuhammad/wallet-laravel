@@ -58,6 +58,9 @@ class RecordController extends Controller
         return $this->updateService->editRecord($record, $request);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function updateTransfer(Record $record, EditTransfer $service, TransferRecordRequest $request)
     {
         return $service->editTransferRecord($record, $request);
