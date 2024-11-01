@@ -6,6 +6,7 @@ use App\Models\Currency;
 use App\Models\Strategy;
 use App\Models\StrategyRule;
 use App\Models\User;
+use App\Services\StrategyService;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -42,5 +43,7 @@ class StrategySeeder extends Seeder
             'currency_id' => Currency::first()->id,
             'strategy_id' => $strategy->id,
         ]);
+        $service = new StrategyService();
+        $service->activateStrategy($strategy);
     }
 }
