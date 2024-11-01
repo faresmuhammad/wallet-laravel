@@ -2,12 +2,15 @@
 
 namespace App\Services;
 
+use App\Enums\RecordType;
 use App\Http\Requests\TransferRecordRequest;
+use App\Http\Resources\TransferResource;
 use App\Models\Balance;
 use App\Models\BalancePerDate;
 use App\Models\Record;
 use App\Models\Wallet;
 use Carbon\Carbon;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -16,72 +19,64 @@ class EditTransfer
 {
 
 
-    public function editTransferRecord(Record $record, TransferRecordRequest $request)
+    /**
+     * @throws \Throwable
+     */
+    public function editTransferRecord(Record $record, TransferRecordRequest $request): JsonResponse
     {
-        /*
-         * check amount changed
-         * check wallets changed
-         * get old sender and receiver balances
-         * get new sender and receiver wallets
-         * get new balances
-         * update new balances
-         * update balance per date for both balances
-         * update record
-         * update transfer
-         */
+        throw_if($record->type != RecordType::Transfer, new HttpResponseException(
+            apiResponse("Record Type Error.", [], ["This record is not a transfer."], status: 403)
+        ));
         DB::beginTransaction();
         $amountChanged = $request->amount != $record->amount;
         $walletsChanged = $request->sender_wallet != $record->transfer->sender_wallet || $request->receiver_wallet != $record->transfer->receiver_wallet;
         if (!$amountChanged && !$walletsChanged)
-            return new JsonResponse([], 200);
+            return apiResponse("You didn't modify amount or wallets.", status: 204);
 
+        $oldSenderWallet = Wallet::find($record->transfer->sender_wallet);
+        $oldReceiverWallet = Wallet::find($record->transfer->receiver_wallet);
 
-        $oldSenderBalance = Balance::find($record->transfer->sender_balance);
-        $oldReceiverBalance = Balance::find($record->transfer->receiver_balance);
+//        dump("old before update",$oldSenderWallet,$oldReceiverWallet);
 
-        $oldSenderBalance->update(['value' => $this->originalBalance($oldSenderBalance->value, $record->amount, SenderOrReceiver::Sender)]);
-        $oldReceiverBalance->update(['value' => $this->originalBalance($oldReceiverBalance->value, $record->amount, SenderOrReceiver::Receiver)]);
+        //Return the wallets' balances to its original balance before the transfer
+        $oldSenderWallet->update(['balance' => $this->originalBalance($oldSenderWallet->balance, $record->amount, SenderOrReceiver::Sender)]);
+        $oldReceiverWallet->update(['balance' => $this->originalBalance($oldReceiverWallet->balance, $record->amount, SenderOrReceiver::Receiver)]);
+//        dump("old after update",$oldSenderWallet,$oldReceiverWallet);
 
         $newSenderWallet = Wallet::find($request->sender_wallet);
         $newReceiverWallet = Wallet::find($request->receiver_wallet);
+//        dump("new before update",$newSenderWallet,$newReceiverWallet);
 
-        $newSenderBalance = $newSenderWallet->balances()->where('currency_id', $request->currency_id)->first();
-        $newReceiverBalance = $newReceiverWallet->balances()->where('currency_id', $request->currency_id)->first();
+        throw_if($newSenderWallet->currency_id != $newReceiverWallet->currency_id, new HttpResponseException(
+            apiResponse("Error while transfer process.", [], ["Can't transfer to a different currency!"], status: 403)
+        ));
 
+        $newSenderWallet->update(['balance' => $newSenderWallet->balance - $request->amount]);
+        $newReceiverWallet->update(['balance' => $newReceiverWallet->balance + $request->amount]);
+//        dump("new after update",$newSenderWallet,$newReceiverWallet);
 
-        $newSenderBalance->update(['value' => $newSenderBalance->value - $request->amount]);
-        $newReceiverBalance->update(['value' => $newReceiverBalance->value + $request->amount]);
+        $record->update([
+            'name' => $request->name ?? $record->name,
+            'amount' => $request->amount ?? $record->amount,
+            'date' => $request->date ?? $record->date,
 
-
-        $this->updateBalancePerDate($record, $newSenderWallet, $newSenderBalance);
-        $this->updateBalancePerDate($record, $newReceiverWallet, $newReceiverBalance);
-
-
-        $this->updateRecord(
-            $record,
-            $newSenderWallet->id,
-            $newSenderBalance->id,
-            $request->amount,
-            $request->date ?: $record->date
-        );
+        ]);
+        //todo: update balance per date
 
 
         $record->transfer->update(
-            $request->except(['sender_wallet', 'receiver_wallet', 'currency_id']) +
             [
+                'name' => $request->name ?? $record->name,
+                'amount' => $request->amount ?? $record->amount,
+                'date' => $request->date ?? $record->date,
                 'sender_wallet' => $newSenderWallet->id,
                 'receiver_wallet' => $newReceiverWallet->id,
-                'sender_balance' => $newSenderBalance->id,
-                'receiver_balance' => $newReceiverBalance->id,
             ]
         );
 
         DB::commit();
 
-        return new JsonResponse([
-            'status' => 'Successful',
-            'message' => 'Your transfer record has been updated'
-        ]);
+        return apiResponse("Transfer has been updated!", new TransferResource($record->transfer), status: 200);
     }
 
     private function originalBalance(float $currentBalance, float $amount, SenderOrReceiver $state): float
@@ -106,18 +101,6 @@ class EditTransfer
             ],
             ['value' => $balance->value]
         );
-    }
-
-    private function updateRecord(Record $record, int $wallet, int $balance, float $amount, Carbon $date): void
-    {
-        $record->update([
-            'amount' => $amount,
-            'type' => 'Transfer',
-            'balance_id' => $balance,
-            'wallet_id' => $wallet,
-            'currency_id' => $record->currency_id,
-            'date' => $date
-        ]);
     }
 }
 
