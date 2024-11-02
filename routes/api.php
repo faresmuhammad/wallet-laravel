@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/transfer', 'transfer');
         Route::put('/update-record/{record}', 'updateRecord');
         Route::put('/update-transfer/{record}', 'updateTransfer');
+        Route::delete('/delete-record/{record}', 'delete');
     });
 });
 
