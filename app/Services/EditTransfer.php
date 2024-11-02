@@ -36,16 +36,13 @@ class EditTransfer
         $oldSenderWallet = Wallet::find($record->transfer->sender_wallet);
         $oldReceiverWallet = Wallet::find($record->transfer->receiver_wallet);
 
-//        dump("old before update",$oldSenderWallet,$oldReceiverWallet);
 
         //Return the wallets' balances to its original balance before the transfer
         $oldSenderWallet->update(['balance' => $this->originalBalance($oldSenderWallet->balance, $record->amount, SenderOrReceiver::Sender)]);
         $oldReceiverWallet->update(['balance' => $this->originalBalance($oldReceiverWallet->balance, $record->amount, SenderOrReceiver::Receiver)]);
-//        dump("old after update",$oldSenderWallet,$oldReceiverWallet);
 
         $newSenderWallet = Wallet::find($request->sender_wallet);
         $newReceiverWallet = Wallet::find($request->receiver_wallet);
-//        dump("new before update",$newSenderWallet,$newReceiverWallet);
 
         throw_if($newSenderWallet->currency_id != $newReceiverWallet->currency_id, new HttpResponseException(
             apiResponse("Error while transfer process.", [], ["Can't transfer to a different currency!"], status: 403)
@@ -53,7 +50,6 @@ class EditTransfer
 
         $newSenderWallet->update(['balance' => $newSenderWallet->balance - $request->amount]);
         $newReceiverWallet->update(['balance' => $newReceiverWallet->balance + $request->amount]);
-//        dump("new after update",$newSenderWallet,$newReceiverWallet);
 
         $record->update([
             'name' => $request->name ?? $record->name,
