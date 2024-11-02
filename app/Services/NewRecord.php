@@ -15,6 +15,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * This service class is responsible for creating a new record and handling related parts
+ * main methods are pay, topup and transfer
+ * helper method is updateBalancesUponRules to update wallet balance upon strategy rules
+ */
 class NewRecord
 {
 
@@ -37,6 +42,9 @@ class NewRecord
         return apiResponse('Record created!', new RecordResource($record), status: 201);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function topup(?int $walletId, Request $request): JsonResponse
     {
         //todo: update balance per date
