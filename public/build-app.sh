@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Build assets using NPM
 npm run build
