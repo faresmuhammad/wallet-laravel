@@ -85,13 +85,12 @@ class NewRecord
     /**
      * @throws \Throwable
      */
-    public function transfer(TransferRecordRequest $request): JsonResponse
+    public function transfer(array $data): JsonResponse
     {
         DB::beginTransaction();
-        $validated = $request->validated();
 
-        $senderWallet = Wallet::find($validated['sender_wallet']);
-        $receiverWallet = Wallet::find($validated['receiver_wallet']);
+        $senderWallet = Wallet::find($data['sender_wallet']);
+        $receiverWallet = Wallet::find($data['receiver_wallet']);
 
         throw_if($senderWallet->currency_id != $receiverWallet->currency_id, new HttpResponseException(
             apiResponse("Error while transfer process.", [], ["Can't transfer to a different currency!"], status: 403)
@@ -102,16 +101,16 @@ class NewRecord
             apiResponse("Strategy Error", [], ["Strategy not activated or there is no strategy found!"], status: 404)
         ));
         $record = Record::create([
-            'name' => $validated['name'],
-            'amount' => $validated['amount'],
-            'date' => $validated['date'] ?? now(),
+            'name' => $data['name'] ?? 'No Name',
+            'amount' => $data['amount'],
+            'date' => $data['date'] ?? now(),
             'strategy_id' => $activeStrategy->id,
             'type' => RecordType::Transfer
         ]);
         $transfer = $record->transfer()->create([
-            'amount' => $validated['amount'],
-            'sender_wallet' => $validated['sender_wallet'],
-            'receiver_wallet' => $validated['receiver_wallet'],
+            'amount' => $data['amount'],
+            'sender_wallet' => $data['sender_wallet'],
+            'receiver_wallet' => $data['receiver_wallet'],
         ]);
         $senderWallet->update([
             'balance' => $senderWallet->balance - $record->amount,

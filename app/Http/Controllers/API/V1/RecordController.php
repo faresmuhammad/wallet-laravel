@@ -51,7 +51,7 @@ class RecordController extends Controller
      */
     public function transfer(TransferRecordRequest $request): JsonResponse
     {
-        return $this->createService->transfer($request);
+        return $this->createService->transfer($request->validated());
     }
 
 
