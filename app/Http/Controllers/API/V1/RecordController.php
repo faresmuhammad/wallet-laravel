@@ -8,12 +8,7 @@ use App\Http\Requests\PayRequest;
 use App\Http\Requests\UpdateRecordRequest;
 use App\Http\Requests\TransferRecordRequest;
 use App\Http\Resources\RecordResource;
-use App\Models\Balance;
-use App\Models\BalancePerDate;
-use App\Models\Category;
-use App\Models\Currency;
 use App\Models\Record;
-use App\Models\Transfer;
 use App\Models\Wallet;
 use App\Services\DeleteRecordService;
 use App\Services\EditRecord;
@@ -22,7 +17,6 @@ use App\Services\NewRecord;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class RecordController extends Controller
 {
@@ -38,12 +32,18 @@ class RecordController extends Controller
 
     public function pay(Wallet $wallet, PayRequest $request): JsonResponse
     {
-        return $this->createService->pay($wallet, $request);
+        return $this->createService->pay($wallet, $request->validated());
     }
 
     public function topup(Request $request, ?int $walletId = null): JsonResponse
     {
-        return $this->createService->topup($walletId, $request);
+        $data = $request->validate([
+            'amount' => 'numeric|required',
+            'name' => 'string',
+            'category_id' => 'integer|exists:categories,id|nullable',
+            'date' => 'date|nullable',
+        ]);
+        return $this->createService->topup($walletId, $data);
     }
 
     /**
