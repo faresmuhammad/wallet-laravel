@@ -22,14 +22,14 @@ class EditTransfer
     /**
      * @throws \Throwable
      */
-    public function editTransferRecord(Record $record, TransferRecordRequest $request): JsonResponse
+    public function editRecord(Record $record, array $data): JsonResponse
     {
         throw_if($record->type != RecordType::Transfer, new HttpResponseException(
             apiResponse("Record Type Error.", [], ["This record is not a transfer."], status: 403)
         ));
         DB::beginTransaction();
-        $amountChanged = $request->amount != $record->amount;
-        $walletsChanged = $request->sender_wallet != $record->transfer->sender_wallet || $request->receiver_wallet != $record->transfer->receiver_wallet;
+        $amountChanged = $data['amount'] != $record->amount;
+        $walletsChanged = $data['sender_wallet'] != $record->transfer->sender_wallet || $data['receiver_wallet'] != $record->transfer->receiver_wallet;
         if (!$amountChanged && !$walletsChanged)
             return apiResponse("You didn't modify amount or wallets.", status: 204);
 
@@ -41,20 +41,20 @@ class EditTransfer
         $oldSenderWallet->update(['balance' => $this->originalBalance($oldSenderWallet->balance, $record->amount, SenderOrReceiver::Sender)]);
         $oldReceiverWallet->update(['balance' => $this->originalBalance($oldReceiverWallet->balance, $record->amount, SenderOrReceiver::Receiver)]);
 
-        $newSenderWallet = Wallet::find($request->sender_wallet);
-        $newReceiverWallet = Wallet::find($request->receiver_wallet);
+        $newSenderWallet = Wallet::find($data['sender_wallet']);
+        $newReceiverWallet = Wallet::find($data['receiver_wallet']);
 
         throw_if($newSenderWallet->currency_id != $newReceiverWallet->currency_id, new HttpResponseException(
             apiResponse("Error while transfer process.", [], ["Can't transfer to a different currency!"], status: 403)
         ));
 
-        $newSenderWallet->update(['balance' => $newSenderWallet->balance - $request->amount]);
-        $newReceiverWallet->update(['balance' => $newReceiverWallet->balance + $request->amount]);
+        $newSenderWallet->update(['balance' => $newSenderWallet->balance - $data['amount']]);
+        $newReceiverWallet->update(['balance' => $newReceiverWallet->balance + $data['amount']]);
 
         $record->update([
-            'name' => $request->name ?? $record->name,
-            'amount' => $request->amount ?? $record->amount,
-            'date' => $request->date ?? $record->date,
+            'name' => $data['name'] ?? $record->name,
+            'amount' => $data['amount'] ?? $record->amount,
+            'date' => $data['date'] ?? $record->date,
 
         ]);
         //todo: update balance per date
@@ -62,9 +62,9 @@ class EditTransfer
 
         $record->transfer->update(
             [
-                'name' => $request->name ?? $record->name,
-                'amount' => $request->amount ?? $record->amount,
-                'date' => $request->date ?? $record->date,
+                'name' => $data['name'] ?? $record->name,
+                'amount' => $data['amount'] ?? $record->amount,
+                'date' => $data['date'] ?? $record->date,
                 'sender_wallet' => $newSenderWallet->id,
                 'receiver_wallet' => $newReceiverWallet->id,
             ]

@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 class EditRecord
 {
 
-    public function editRecord(Record $record, UpdateRecordRequest $request): JsonResponse
+    public function editRecord(Record $record, array $data): JsonResponse
     {
         /*
          * ** Budget Updates ** -> todo
@@ -28,12 +28,12 @@ class EditRecord
         DB::beginTransaction();
         $this->updateBalance(
             $record,
-            $request->amount,
+            $data['amount'],
             from: $record->type,
-            to: $request->type ? RecordType::from($request->type) : $record->type
+            to: isset($data['type']) ? RecordType::from($data['type']) : $record->type
         );
 
-        $record->update($request->validated());
+        $record->update($data);
 
         //todo: update balance per date
         DB::commit();

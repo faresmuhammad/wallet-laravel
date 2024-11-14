@@ -57,7 +57,7 @@ class RecordController extends Controller
 
     public function updateRecord(Record $record, UpdateRecordRequest $request)
     {
-        return $this->updateService->editRecord($record, $request);
+        return $this->updateService->editRecord($record, $request->validated());
     }
 
     /**
@@ -65,7 +65,7 @@ class RecordController extends Controller
      */
     public function updateTransfer(Record $record, EditTransfer $service, TransferRecordRequest $request)
     {
-        return $service->editTransferRecord($record, $request);
+        return $service->editRecord($record, $request->validated());
     }
 
 
