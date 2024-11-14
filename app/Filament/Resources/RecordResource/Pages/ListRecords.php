@@ -67,5 +67,4 @@ class ListRecords extends BaseListRecords
         ];
     }
 
-
 }

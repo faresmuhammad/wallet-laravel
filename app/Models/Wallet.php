@@ -50,4 +50,9 @@ class Wallet extends Model
     {
         return $this->hasMany(Record::class,'related_to');
     }
+
+    public function scopeIncludedToStats($query)
+    {
+        return $query->where('include_to_stats', true);
+    }
 }

@@ -16,7 +16,7 @@ return new class extends Migration {
          * Adding currency_id column for Many-to-One relationship
          */
         Schema::table('wallets', function (Blueprint $table) {
-            $table->dropColumn(['color','initial_balance','include_to_stats']);
+            $table->dropColumn(['color','initial_balance']);
             $table->addColumn('double', 'balance')->default(0);
             $table->foreignId('currency_id')->references('id')->on('currencies');
         });
