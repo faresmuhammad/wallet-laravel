@@ -19,13 +19,9 @@ class Record extends Model
         'type' => RecordType::class
     ];
 
-    public $timestamps = false;
 
 
-    public function strategy(): BelongsTo
-    {
-        return $this->belongsTo(Strategy::class);
-    }
+
 
     public function category(): BelongsTo
     {
@@ -38,13 +34,8 @@ class Record extends Model
         return $this->hasOne(Transfer::class);
     }
 
-    public function budget(): BelongsTo
+    public function wallet(): BelongsTo
     {
-        return $this->belongsTo(Budget::class);
-    }
-
-    public function relatedWallet(): BelongsTo
-    {
-        return $this->belongsTo(Wallet::class, 'related_to');
+        return $this->belongsTo(Wallet::class);
     }
 }

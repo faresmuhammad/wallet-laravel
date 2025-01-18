@@ -14,20 +14,15 @@ return new class extends Migration {
             $table->id();
             $table->string('name', 100);
             $table->text('description')->nullable();
-            $table->string('color', 7)->default('#ffffff');
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreignId('user_id')->nullable();
             $table->timestamps();
 
             $table->foreign('parent_id')->references('id')
                 ->on('categories')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
 
-            $table->foreign('user_id')->references('id')
-                ->on('users')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
         });
     }
 

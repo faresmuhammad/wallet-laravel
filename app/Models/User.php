@@ -52,13 +52,5 @@ class User extends Authenticatable
         return $this->hasMany(Wallet::class);
     }
 
-    public function budgets(): HasMany
-    {
-        return $this->hasMany(Budget::class);
-    }
 
-    public function isAdmin()
-    {
-        return $this->is_admin;
-    }
 }
