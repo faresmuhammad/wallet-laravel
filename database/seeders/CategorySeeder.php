@@ -29,31 +29,25 @@ class CategorySeeder extends Seeder
         $this->insertCollection('Food', [
             'Groceries',
             'Dining out',
+            'Talabat',
         ]);
 
-        $this->insertCollection('Leisure', [
-            'Movies',
-            'Video Rental',
-            'Magazines',
-        ]);
-
-        $this->insertCollection('Automobile', [
-            'Maintenance',
-            'Gas',
-            'Parking',
-            'Registration',
+        $this->insertCollection('Transportation', [
+            'Fuel',
+            'Public Transport',
+            'Taxi',
+            'Car Maintenance',
         ]);
 
         $this->insertCollection('Education', [
             'Books',
-            'Tuition',
-            'Others',
+            'Courses',
         ]);
 
-        $this->insertCollection('Homeneeds', [
+        $this->insertCollection('Home Needs', [
             'Clothing',
             'Furnishing',
-            'Others',
+            'Equipment',
         ]);
 
         $this->insertCollection('Healthcare', [
@@ -64,12 +58,6 @@ class CategorySeeder extends Seeder
             'Prescriptions',
         ]);
 
-        $this->insertCollection('Insurance', [
-            'Life',
-            'Home',
-            'Health',
-            'Auto',
-        ]);
 
         $this->insertCollection('Vacation', [
             'Travel',
