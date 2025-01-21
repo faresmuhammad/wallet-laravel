@@ -16,13 +16,13 @@ class WalletSeeder extends Seeder
     {
         Wallet::create([
             'name' => 'EGP',
-            'balance' => 19464.21,
+            'balance' => 5706.21,
             'user_id' => User::first()->id,
             'currency' => 'EGP'
         ]);
         Wallet::create([
             'name' => 'USD',
-            'balance' => 100.0,
+            'balance' => 0.0,
             'user_id' => User::first()->id,
             'currency' => 'USD'
         ]);

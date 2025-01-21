@@ -41,9 +41,9 @@ class RecordController extends Controller
         return $this->createService->pay($wallet, $request);
     }
 
-    public function topup(Request $request, ?int $walletId = null): JsonResponse
+    public function topup(Request $request, Wallet $wallet): JsonResponse
     {
-        return $this->createService->topup($walletId, $request);
+        return $this->createService->topup($wallet, $request);
     }
 
     /**

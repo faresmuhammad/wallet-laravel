@@ -14,9 +14,8 @@ class RecordSeeder extends Seeder
      */
     public function run(): void
     {
-//        ds(ini_get('memory_limit'))->label('memory limit');
         ini_set('memory_limit', '2048M');
-        Excel::import(new RecordsImport(), base_path() . '/App Files/expenses.xlsx');
+        Excel::import(new RecordsImport(), base_path() . '/App Files/expenses.csv');
         ini_set('memory_limit', '128M');
     }
 }

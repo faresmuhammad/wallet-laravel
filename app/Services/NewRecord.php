@@ -25,14 +25,16 @@ class NewRecord
 
     public function pay(Wallet $wallet, PayRequest $request): JsonResponse
     {
-        //get the proper rule to apply the record on
-        //update the rule's wallet balance
+        if (isset($request->currency) && $wallet->currency !== $request->currency) {
+            throw new HttpResponseException(
+                apiResponse("Error while pay process.", [], ["Can't pay with a different currency!"], status: 403)
+            );
+        }
         DB::beginTransaction();
         $record = $wallet->records()->create(
-            $request->validated() +
+            $request->all() +
             [
                 'type' => RecordType::Expense,
-                'strategy_id' => $wallet->strategy_id,
             ]
         );
         $wallet->update([
@@ -45,40 +47,26 @@ class NewRecord
     /**
      * @throws \Throwable
      */
-    public function topup(?int $walletId, Request $request): JsonResponse
+    public function topup(Wallet $wallet, Request $request): JsonResponse
     {
+        if (isset($request->currency) && $wallet->currency !== $request->currency ) {
+            throw new HttpResponseException(
+                apiResponse("Error while topup process.", [], ["Can't topup with a different currency!"], status: 403)
+            );
+        }
         //todo: update balance per date
         DB::beginTransaction();
-        if ($walletId) {
-            $wallet = Wallet::find($walletId);
-            $record = $wallet->records()->create([
-                'amount' => $request->amount,
-                'name' => $request->name ?? 'No Name',
-                'category_id' => $request->category_id,
-                'strategy_id' => $wallet->strategy->id,
-                'date' => $request->date ?? now(),
-                'type' => RecordType::Income
-            ]);
-            $wallet->update([
-                'balance' => $wallet->balance + $record->amount,
-            ]);
-            DB::commit();
-            return apiResponse('Record created!', new RecordResource($record), status: 201);
-        }
-        $activeStrategy = Strategy::isActive()->first();
-
-        throw_if(is_null($activeStrategy), new HttpResponseException(
-            apiResponse("Strategy Error", [], ["Strategy not activated or there is no strategy found!"], status: 404)
-        ));
-        $record = Record::create([
+        $record = $wallet->records()->create([
             'amount' => $request->amount,
             'name' => $request->name ?? 'No Name',
             'category_id' => $request->category_id,
-            'strategy_id' => $activeStrategy->id,
             'date' => $request->date ?? now(),
             'type' => RecordType::Income
         ]);
-        $this->updateBalancesUponRules($request->amount, $activeStrategy->rules);
+        $wallet->update([
+            'balance' => $wallet->balance + $record->amount,
+        ]);
+
         DB::commit();
         return apiResponse('Record created!', new RecordResource($record), status: 201);
 
@@ -99,15 +87,11 @@ class NewRecord
             apiResponse("Error while transfer process.", [], ["Can't transfer to a different currency!"], status: 403)
         ));
 
-        $activeStrategy = Strategy::isActive()->first();
-        throw_if(is_null($activeStrategy), new HttpResponseException(
-            apiResponse("Strategy Error", [], ["Strategy not activated or there is no strategy found!"], status: 404)
-        ));
+
         $record = Record::create([
             'name' => $validated['name'],
             'amount' => $validated['amount'],
             'date' => $validated['date'] ?? now(),
-            'strategy_id' => $activeStrategy->id,
             'type' => RecordType::Transfer
         ]);
         $transfer = $record->transfer()->create([
@@ -124,22 +108,6 @@ class NewRecord
         //todo: update balance per date
         DB::commit();
         return apiResponse("Transfer success!", new TransferResource($transfer), status: 201);
-    }
-
-    /**
-     * @param float $amount
-     * @param $rules
-     * @return void
-     */
-    private function updateBalancesUponRules(float $amount, $rules): void
-    {
-        foreach ($rules as $rule) {
-            $calculatedAmount = $amount * $rule->ratio;
-            $rule->wallet()->update([
-                'balance' => $rule->wallet->balance + $calculatedAmount,
-            ]);
-        }
-
     }
 
 

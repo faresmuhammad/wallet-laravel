@@ -33,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(RecordController::class)->group(function () {
         Route::post('/pay/{wallet}', 'pay');
-        Route::post('/topup/{id?}', 'topup');
+        Route::post('/topup/{wallet}', 'topup');
         Route::post('/transfer', 'transfer');
         Route::put('/update-record/{record}', 'updateRecord');
         Route::put('/update-transfer/{record}', 'updateTransfer');

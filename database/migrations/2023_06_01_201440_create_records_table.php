@@ -16,6 +16,7 @@ return new class extends Migration
             $table->double('amount');
             $table->string('name')->nullable();
             $table->string('type');
+            $table->string('currency', 3)->default('EGP');
             $table->double('balance_before')->default(0);
             $table->double('balance_after')->default(0);
             $table->dateTime('date')->default(now());

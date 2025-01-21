@@ -26,6 +26,7 @@ class PayRequest extends FormRequest
             'name' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'date' => 'nullable|date',
+            'currency' => 'string'
         ];
     }
 

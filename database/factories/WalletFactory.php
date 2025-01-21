@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,8 +19,8 @@ class WalletFactory extends Factory
     {
         return [
             'name' => 'Cash',
-            'color' => '#eeeeee',
-            'initial_balance' => 1000.0
+            'balance' => 1000.0,
+            'user_id' => 1,
         ];
     }
 }
