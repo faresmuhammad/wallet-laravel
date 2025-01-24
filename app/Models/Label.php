@@ -16,4 +16,6 @@ class Label extends Model
     {
         return $this->belongsToMany(Record::class, 'label_record_pivot', 'label_id', 'record_id');
     }
+
+
 }

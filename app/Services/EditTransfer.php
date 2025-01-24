@@ -59,6 +59,7 @@ class EditTransfer
             'date' => $request->date ?? $record->date,
 
         ]);
+        $record->labels()->sync($request->labels);
         //todo: update balance per date
 
 

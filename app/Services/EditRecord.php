@@ -33,8 +33,8 @@ class EditRecord
             to: $request->type ? RecordType::from($request->type) : $record->type
         );
 
-        $record->update($request->validated());
-
+        $record->update($request->safe()->except('labels'));
+        $record->labels()->sync($request->labels);
         //todo: update balance per date
         DB::commit();
 

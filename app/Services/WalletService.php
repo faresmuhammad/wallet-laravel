@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class WalletService
 {
 
-    public function showWallet(Wallet $wallet): array
+    public function showWalletResource(Wallet $wallet): array
     {
         return [
             'wallet' => new WalletResource($wallet),

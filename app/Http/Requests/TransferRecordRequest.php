@@ -27,7 +27,9 @@ class TransferRecordRequest extends FormRequest
             'sender_wallet' => 'integer|exists:wallets,id',
             'receiver_wallet' => 'integer|exists:wallets,id',
             'amount' => 'numeric',
-            'date' => 'date|nullable'
+            'date' => 'date|nullable',
+            'labels' => 'array',
+            'labels.*' => 'integer|exists:labels,id',
         ];
     }
 }

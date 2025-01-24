@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RecordResource extends JsonResource
+class LabelResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,12 +16,7 @@ class RecordResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'amount' => $this->amount,
             'name' => $this->name,
-            'type' => $this->type,
-            'date' => formatDate($this->date),
-            'category' => new CategoryResource($this->category),
-            'labels' => LabelResource::collection($this->labels),
         ];
     }
 }

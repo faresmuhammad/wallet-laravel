@@ -21,7 +21,7 @@ class WalletController extends Controller
 
     public function show(Wallet $wallet)
     {
-        return apiResponse('Wallet found!', $this->service->showWallet($wallet));
+        return apiResponse('Wallet found!', $this->service->showWalletResource($wallet));
     }
 
     public function store(Request $request)

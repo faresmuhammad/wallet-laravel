@@ -52,5 +52,15 @@ class User extends Authenticatable
         return $this->hasMany(Wallet::class);
     }
 
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class)->with('subcategories')->whereNull('parent_id');
+    }
+
+    public function labels(): HasMany
+    {
+        return $this->hasMany(Label::class);
+    }
+
 
 }

@@ -64,7 +64,6 @@ class RecordsImport implements ToModel
      */
     public function attachLabelsToRecord(array $row, Record $record): void
     {
-        ds('record id: ' . $record->id . ' | row 3: ' . $row[3] . ' | label: ' . $row[6]);
         if ($row[3] != '') {
             $label = Label::firstOrCreate(['name' => $row[3]]);
             $record->labels()->attach($label);

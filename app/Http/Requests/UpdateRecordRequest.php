@@ -28,6 +28,8 @@ class UpdateRecordRequest extends FormRequest
             'category_id' => 'integer|nullable|exists:categories,id',
             'date' => 'date',
             'type' => 'string|in:Income,Expense,Transfer',
+            'labels' => 'array',
+            'labels.*' => 'integer|exists:labels,id',
         ];
     }
 }

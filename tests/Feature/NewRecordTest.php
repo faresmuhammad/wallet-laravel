@@ -2,14 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Http\Requests\PayRequest;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Services\NewRecord;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class NewRecordTest extends TestCase

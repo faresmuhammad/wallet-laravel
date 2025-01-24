@@ -14,9 +14,10 @@ class DeleteRecordService
     {
         DB::beginTransaction();
         $wallet = $record->wallet;
-        $record->wallet->update([
+        $wallet->update([
             'balance' => $wallet->balance + $record->amount
         ]);
+        $record->labels()->detach();
         $record->delete();
         DB::commit();
         return apiResponse("Record deleted successfully");
@@ -31,6 +32,7 @@ class DeleteRecordService
         $wallet->update([
             'balance' => $wallet->balance - $record->amount
         ]);
+        $record->labels()->detach();
         $record->delete();
         DB::commit();
         return apiResponse("Record deleted successfully");
@@ -47,7 +49,8 @@ class DeleteRecordService
         $transfer->receiverWallet->update([
             'balance' => $transfer->receiverWallet->balance - $record->amount
         ]);
-
+        
+        $record->labels()->detach();
         $record->delete();
         DB::commit();
         return apiResponse("Record deleted successfully");

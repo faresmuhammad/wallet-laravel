@@ -5,8 +5,8 @@ use App\Http\Controllers\API\V1\Auth\LoginApiController;
 use App\Http\Controllers\API\V1\Auth\RegisterApiController;
 use App\Http\Controllers\API\V1\Auth\ResetPasswordApiController;
 use App\Http\Controllers\API\V1\RecordController;
-use App\Http\Controllers\API\V1\StrategyController;
 use App\Http\Controllers\API\V1\WalletController;
+use App\Http\Controllers\API\V1\CategoryLabelController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,12 +35,24 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(RecordController::class)->group(function () {
+        Route::get('/records/{wallet}', 'index');
         Route::post('/pay/{wallet}', 'pay');
         Route::post('/topup/{wallet}', 'topup');
         Route::post('/transfer', 'transfer');
         Route::put('/update-record/{record}', 'updateRecord');
         Route::put('/update-transfer/{record}', 'updateTransfer');
         Route::delete('/delete-record/{record}', 'delete');
+    });
+
+    Route::controller(CategoryLabelController::class)->group(function () {
+        Route::get('/categories', 'categories');
+        Route::get('/labels', 'labels');
+        Route::post('/categories', 'storeCategory');
+        Route::post('/labels', 'storeLabel');
+        Route::put('/categories/{category}', 'updateCategory');
+        Route::put('/labels/{label}', 'updateLabel');
+        Route::delete('/categories/{category}', 'destroyCategory');
+        Route::delete('/labels/{label}', 'destroyLabel');
     });
 });
 

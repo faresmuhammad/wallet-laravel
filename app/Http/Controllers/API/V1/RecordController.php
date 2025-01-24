@@ -28,14 +28,14 @@ use Illuminate\Support\Facades\DB;
 
 class RecordController extends Controller
 {
-    public function __construct(private NewRecord $createService, private EditRecord $updateService)
+    public function __construct(private readonly NewRecord $createService, private readonly EditRecord $updateService)
     {
     }
 
     public function index(Wallet $wallet)
     {
         $records = $wallet->records;
-        return RecordResource::collection($records);
+        return apiResponse('Records Retrieved', RecordResource::collection($records));
     }
 
     public function pay(Wallet $wallet, PayRequest $request): JsonResponse
@@ -73,7 +73,6 @@ class RecordController extends Controller
     public function updateTransfer(Record $record, EditTransfer $service, TransferRecordRequest $request)
     {
         $record = $service->editTransferRecord($record, $request);
-        ds($record);
         return apiResponse('Transfer Record Updated Successfully', new TransferResource($record->transfer));
     }
 

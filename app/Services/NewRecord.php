@@ -33,11 +33,12 @@ class NewRecord
         }
         DB::beginTransaction();
         $record = $wallet->records()->create(
-            $request->all() +
+            $request->except('labels') +
             [
                 'type' => RecordType::Expense,
             ]
         );
+        $record->labels()->sync($request->labels);
         $wallet->update([
             'balance' => $wallet->balance - $record->amount,
         ]);
@@ -64,6 +65,7 @@ class NewRecord
             'date' => $request->date ?? now(),
             'type' => RecordType::Income
         ]);
+        $record->labels()->sync($request->labels);
         $wallet->update([
             'balance' => $wallet->balance + $record->amount,
         ]);
@@ -79,7 +81,6 @@ class NewRecord
     public function transfer(TransferRecordRequest $request): Transfer
     {
         DB::beginTransaction();
-        $validated = $request->validated();
 
         $senderWallet = Wallet::find($request->sender_wallet);
         $receiverWallet = Wallet::find($request->receiver_wallet);
@@ -90,11 +91,13 @@ class NewRecord
 
 
         $record = Record::create([
-            'name' => $request->name,
+            'name' => $request->name ?? 'No Name',
             'amount' => $request->amount,
             'date' => $request->date ?? now(),
             'type' => RecordType::Transfer
         ]);
+
+        $record->labels()->sync($request->labels);
         $transfer = $record->transfer()->create([
             'amount' => $request->amount,
             'sender_wallet' => $request->sender_wallet,
