@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             LabelSeeder::class,
             WalletSeeder::class,
-            RecordSeeder::class,
+//            RecordSeeder::class,
         ]);
     }
 }

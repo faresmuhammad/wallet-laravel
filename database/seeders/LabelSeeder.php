@@ -23,6 +23,8 @@ class LabelSeeder extends Seeder
             'Travel',
             'Fitness',
             'Charity',
+            'Liabilities',
+            'Spendings',
         ];
 
         foreach ($labels as $label) {

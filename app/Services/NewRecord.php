@@ -9,6 +9,7 @@ use App\Http\Resources\RecordResource;
 use App\Http\Resources\TransferResource;
 use App\Models\Record;
 use App\Models\Strategy;
+use App\Models\Transfer;
 use App\Models\Wallet;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\DB;
 class NewRecord
 {
 
-    public function pay(Wallet $wallet, PayRequest $request): JsonResponse
+    public function pay(Wallet $wallet, PayRequest $request): Record
     {
         if (isset($request->currency) && $wallet->currency !== $request->currency) {
             throw new HttpResponseException(
@@ -41,15 +42,15 @@ class NewRecord
             'balance' => $wallet->balance - $record->amount,
         ]);
         DB::commit();
-        return apiResponse('Record created!', new RecordResource($record), status: 201);
+        return $record;
     }
 
     /**
      * @throws \Throwable
      */
-    public function topup(Wallet $wallet, Request $request): JsonResponse
+    public function topup(Wallet $wallet, Request $request): Record
     {
-        if (isset($request->currency) && $wallet->currency !== $request->currency ) {
+        if (isset($request->currency) && $wallet->currency !== $request->currency) {
             throw new HttpResponseException(
                 apiResponse("Error while topup process.", [], ["Can't topup with a different currency!"], status: 403)
             );
@@ -68,36 +69,36 @@ class NewRecord
         ]);
 
         DB::commit();
-        return apiResponse('Record created!', new RecordResource($record), status: 201);
+        return $record;
 
     }
 
     /**
      * @throws \Throwable
      */
-    public function transfer(TransferRecordRequest $request): JsonResponse
+    public function transfer(TransferRecordRequest $request): Transfer
     {
         DB::beginTransaction();
         $validated = $request->validated();
 
-        $senderWallet = Wallet::find($validated['sender_wallet']);
-        $receiverWallet = Wallet::find($validated['receiver_wallet']);
+        $senderWallet = Wallet::find($request->sender_wallet);
+        $receiverWallet = Wallet::find($request->receiver_wallet);
 
-        throw_if($senderWallet->currency_id != $receiverWallet->currency_id, new HttpResponseException(
+        throw_if($senderWallet->currency != $receiverWallet->currency, new HttpResponseException(
             apiResponse("Error while transfer process.", [], ["Can't transfer to a different currency!"], status: 403)
         ));
 
 
         $record = Record::create([
-            'name' => $validated['name'],
-            'amount' => $validated['amount'],
-            'date' => $validated['date'] ?? now(),
+            'name' => $request->name,
+            'amount' => $request->amount,
+            'date' => $request->date ?? now(),
             'type' => RecordType::Transfer
         ]);
         $transfer = $record->transfer()->create([
-            'amount' => $validated['amount'],
-            'sender_wallet' => $validated['sender_wallet'],
-            'receiver_wallet' => $validated['receiver_wallet'],
+            'amount' => $request->amount,
+            'sender_wallet' => $request->sender_wallet,
+            'receiver_wallet' => $request->receiver_wallet,
         ]);
         $senderWallet->update([
             'balance' => $senderWallet->balance - $record->amount,
@@ -107,7 +108,7 @@ class NewRecord
         ]);
         //todo: update balance per date
         DB::commit();
-        return apiResponse("Transfer success!", new TransferResource($transfer), status: 201);
+        return $transfer;
     }
 
 

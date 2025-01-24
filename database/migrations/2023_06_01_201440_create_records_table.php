@@ -20,7 +20,7 @@ return new class extends Migration
             $table->double('balance_before')->default(0);
             $table->double('balance_after')->default(0);
             $table->dateTime('date')->default(now());
-            $table->foreignId('wallet_id')->constrained('wallets')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('wallet_id')->nullable()->constrained('wallets')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('category_id')->nullable();
             $table->timestamps();
         });

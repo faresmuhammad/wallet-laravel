@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('name', 40);
             $table->double('balance');
             $table->string('currency',3)->default('EGP');
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
 
         });

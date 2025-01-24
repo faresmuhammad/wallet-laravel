@@ -25,8 +25,8 @@ class UpdateRecordRequest extends FormRequest
         return [
             'amount' => 'numeric',
             'name' => 'nullable|string',
-            'category_id' => 'integer|nullable',
-            'date' => 'datetime',
+            'category_id' => 'integer|nullable|exists:categories,id',
+            'date' => 'date',
             'type' => 'string|in:Income,Expense,Transfer',
         ];
     }

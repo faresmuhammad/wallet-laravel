@@ -24,8 +24,8 @@ class TransferRecordRequest extends FormRequest
     {
         return [
             'name' => 'string',
-            'sender_wallet' => 'integer',
-            'receiver_wallet' => 'integer',
+            'sender_wallet' => 'integer|exists:wallets,id',
+            'receiver_wallet' => 'integer|exists:wallets,id',
             'amount' => 'numeric',
             'date' => 'date|nullable'
         ];
