@@ -15,13 +15,10 @@ class WalletResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
-            'color' => $this->color,
-            'initialBalance' => $this->initial_balance,
-            'includedToStatistics' => $this->included_to_stats,
-            'balances' => $this->balances,
-            //todo: delete this, it is just for development
-            'user' => $this->user
+            'balance' => $this->balance,
+            'currency' => $this->currency,
         ];
     }
 }

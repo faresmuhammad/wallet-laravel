@@ -7,8 +7,6 @@ use App\Models\Transfer;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Tests\TestCase;
 
 class EditRecordTest extends TestCase
@@ -16,19 +14,14 @@ class EditRecordTest extends TestCase
 
     use RefreshDatabase;
 
-    protected function afterRefreshingDatabase()
-    {
-        $this->seed();
-    }
-
     public function test_update_record_from_expense_to_expense()
     {
-        $user = User::find(1);
+        $user = User::factory()->create();
+
         $wallet = Wallet::factory()->create(['balance' => 100]);
         $payResponse = $this->actingAs($user)->post('/api/pay/' . $wallet->id, [
             'amount' => 50,
             'name' => 'Test Pay',
-            'category_id' => 1,
             'date' => now(),
         ]);
         $this->assertEquals(50, $wallet->fresh()->balance);
@@ -37,7 +30,6 @@ class EditRecordTest extends TestCase
         $response = $this->actingAs($user)->put('/api/update-record/' . $payResponse->json('data')['id'], [
             'amount' => 60,
             'name' => 'Test Pay Updated',
-            'category_id' => 1,
             'date' => now(),
             'type' => RecordType::Expense->value,
         ]);
@@ -47,12 +39,12 @@ class EditRecordTest extends TestCase
 
     public function test_update_record_from_expense_to_income()
     {
-        $user = User::find(1);
+        $user = User::factory()->create();
+
         $wallet = Wallet::factory()->create(['balance' => 100]);
         $payResponse = $this->actingAs($user)->post('/api/pay/' . $wallet->id, [
             'amount' => 50,
             'name' => 'Test Pay',
-            'category_id' => 1,
             'date' => now(),
         ]);
         $this->assertEquals(50, $wallet->fresh()->balance);
@@ -61,7 +53,6 @@ class EditRecordTest extends TestCase
         $response = $this->actingAs($user)->put('/api/update-record/' . $payResponse->json('data')['id'], [
             'amount' => 60,
             'name' => 'Test Pay Updated',
-            'category_id' => 1,
             'date' => now(),
             'type' => RecordType::Income->value,
         ]);
@@ -71,12 +62,12 @@ class EditRecordTest extends TestCase
 
     public function test_update_record_from_income_to_income()
     {
-        $user = User::find(1);
+        $user = User::factory()->create();
+
         $wallet = Wallet::factory()->create(['balance' => 100]);
         $topupResponse = $this->actingAs($user)->post('/api/topup/' . $wallet->id, [
             'amount' => 50,
             'name' => 'Test Topup',
-            'category_id' => 1,
             'date' => now(),
         ]);
         $this->assertEquals(150, $wallet->fresh()->balance);
@@ -85,7 +76,6 @@ class EditRecordTest extends TestCase
         $response = $this->actingAs($user)->put('/api/update-record/' . $topupResponse->json('data')['id'], [
             'amount' => 60,
             'name' => 'Test Topup Updated',
-            'category_id' => 1,
             'date' => now(),
             'type' => RecordType::Income->value,
         ]);
@@ -95,12 +85,12 @@ class EditRecordTest extends TestCase
 
     public function test_update_record_from_income_to_expense()
     {
-        $user = User::find(1);
+        $user = User::factory()->create();
+
         $wallet = Wallet::factory()->create(['balance' => 100]);
         $topupResponse = $this->actingAs($user)->post('/api/topup/' . $wallet->id, [
             'amount' => 50,
             'name' => 'Test Topup',
-            'category_id' => 1,
             'date' => now(),
         ]);
         $this->assertEquals(150, $wallet->fresh()->balance);
@@ -109,7 +99,6 @@ class EditRecordTest extends TestCase
         $response = $this->actingAs($user)->put('/api/update-record/' . $topupResponse->json('data')['id'], [
             'amount' => 60,
             'name' => 'Test Topup Updated',
-            'category_id' => 1,
             'date' => now(),
             'type' => RecordType::Expense->value,
         ]);
@@ -119,13 +108,13 @@ class EditRecordTest extends TestCase
 
     public function test_call_edit_transfer_on_non_transfer_record_throws_an_exception()
     {
-        $user = User::find(1);
+        $user = User::factory()->create();
+
         $wallet = Wallet::factory()->create(['balance' => 100]);
         $wallet2 = Wallet::factory()->create(['balance' => 100]);
         $record = $wallet->records()->create([
             'amount' => 50,
             'name' => 'Test Pay',
-            'category_id' => 1,
             'date' => now(),
             'type' => RecordType::Expense->value,
         ]);
@@ -143,9 +132,10 @@ class EditRecordTest extends TestCase
 
     public function test_update_transfer_without_any_modifications_throws_an_exception()
     {
-        $user = User::find(1);
-        $wallet1 = Wallet::factory()->create(['balance' => 100]);
-        $wallet2 = Wallet::factory()->create(['balance' => 100]);
+        $user = User::factory()->create();
+
+        $wallet1 = Wallet::factory()->create(['balance' => 100,'user_id' => $user->id]);
+        $wallet2 = Wallet::factory()->create(['balance' => 100,'user_id' => $user->id]);
         $response = $this->actingAs($user)->post('/api/transfer', [
             'amount' => 50,
             'sender_wallet' => $wallet1->id,
@@ -165,7 +155,8 @@ class EditRecordTest extends TestCase
 
     public function test_update_transfer_between_wallets_works_properly()
     {
-        $user = User::find(1);
+        $user = User::factory()->create();
+
         $wallet1 = Wallet::factory()->create(['balance' => 100]);
         $wallet2 = Wallet::factory()->create(['balance' => 100]);
         $response = $this->actingAs($user)->post('/api/transfer', [

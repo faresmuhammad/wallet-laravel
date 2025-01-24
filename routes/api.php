@@ -6,6 +6,7 @@ use App\Http\Controllers\API\V1\Auth\RegisterApiController;
 use App\Http\Controllers\API\V1\Auth\ResetPasswordApiController;
 use App\Http\Controllers\API\V1\RecordController;
 use App\Http\Controllers\API\V1\StrategyController;
+use App\Http\Controllers\API\V1\WalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,10 +26,12 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::controller(StrategyController::class)->group(function () {
-        Route::post('/strategies', 'store');
-        Route::put('/strategies/{strategy}', 'updateName');
-        Route::post('/strategies/{strategy}/activate', 'activateStrategy');
+    Route::controller(WalletController::class)->group(function () {
+        Route::get('/wallets', 'index');
+        Route::get('/wallets/{wallet}', 'show');
+        Route::post('/wallets', 'store');
+        Route::put('/wallets/{wallet}', 'update');
+        Route::delete('/wallets/{wallet}', 'destroy');
     });
 
     Route::controller(RecordController::class)->group(function () {

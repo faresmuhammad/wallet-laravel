@@ -16,21 +16,13 @@ class NewRecordTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function afterRefreshingDatabase()
-    {
-        $this->seed();
-    }
-
     public function test_pay_call_subtract_the_amount_from_wallet_balance()
     {
-        $user = User::find(1);
-
-
-        $wallet = Wallet::factory()->create(['balance' => 100]);
+        $user = User::factory()->create();
+        $wallet = Wallet::factory()->create(['balance' => 100,'user_id' => $user->id]);
         $response = $this->actingAs($user)->post('/api/pay/' . $wallet->id, [
             'amount' => 50,
             'name' => 'Test Pay',
-            'category_id' => 1,
             'date' => now(),
         ]);
 
@@ -40,12 +32,11 @@ class NewRecordTest extends TestCase
 
     public function test_topup_call_add_the_amount_to_wallet_balance()
     {
-        $user = User::find(1);
-        $wallet = Wallet::factory()->create(['balance' => 100]);
+        $user = User::factory()->create();
+        $wallet = Wallet::factory()->create(['balance' => 100,'user_id' => $user->id]);
         $response = $this->actingAs($user)->post('/api/topup/' . $wallet->id, [
             'amount' => 50,
             'name' => 'Test Topup',
-            'category_id' => 1,
             'date' => now(),
         ]);
         $this->assertEquals(150, $wallet->fresh()->balance);
@@ -54,13 +45,12 @@ class NewRecordTest extends TestCase
 
     public function test_create_a_record_with_different_currency_from_wallet()
     {
-        $user = User::find(1);
+        $user = User::factory()->create();
 
-        $wallet = Wallet::factory()->create(['balance' => 100]);
+        $wallet = Wallet::factory()->create(['balance' => 100,'user_id' => $user->id]);
         $payResponse = $this->actingAs($user)->post('/api/pay/' . $wallet->id, [
             'amount' => 50,
             'name' => 'Test Pay',
-            'category_id' => 1,
             'date' => now(),
             'currency' => 'USD',
         ]);
@@ -68,7 +58,6 @@ class NewRecordTest extends TestCase
         $topupResponse = $this->post('/api/topup/' . $wallet->id, [
             'amount' => 50,
             'name' => 'Test Topup',
-            'category_id' => 1,
             'date' => now(),
             'currency' => 'EUR',
         ]);
@@ -77,9 +66,10 @@ class NewRecordTest extends TestCase
 
     public function test_transfer_amount_from_wallet_to_another_with_the_same_currency()
     {
-        $user = User::find(1);
-        $wallet1 = Wallet::factory()->create(['balance' => 100]);
-        $wallet2 = Wallet::factory()->create(['balance' => 100]);
+        $user = User::factory()->create();
+
+        $wallet1 = Wallet::factory()->create(['balance' => 100,'user_id' => $user->id]);
+        $wallet2 = Wallet::factory()->create(['balance' => 100,'user_id' => $user->id]);
         $response = $this->actingAs($user)->post('/api/transfer', [
             'amount' => 50,
             'sender_wallet' => $wallet1->id,
@@ -93,9 +83,10 @@ class NewRecordTest extends TestCase
 
     public function test_transfer_amount_from_wallet_to_another_with_different_currency_throws_exception()
     {
-        $user = User::find(1);
-        $wallet1 = Wallet::factory()->create(['balance' => 100, 'currency' => 'USD']);
-        $wallet2 = Wallet::factory()->create(['balance' => 100]);
+        $user = User::factory()->create();
+
+        $wallet1 = Wallet::factory()->create(['balance' => 100, 'currency' => 'USD','user_id' => $user->id]);
+        $wallet2 = Wallet::factory()->create(['balance' => 100,'user_id' => $user->id]);
         $response = $this->actingAs($user)->post('/api/transfer', [
             'amount' => 50,
             'sender_wallet' => $wallet1->id,
