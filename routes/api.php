@@ -8,6 +8,7 @@ use App\Http\Controllers\API\V1\RecordController;
 use App\Http\Controllers\API\V1\StatisticsController;
 use App\Http\Controllers\API\V1\WalletController;
 use App\Http\Controllers\API\V1\CategoryLabelController;
+use App\Http\Controllers\StatisticController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -56,7 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/labels/{label}', 'destroyLabel');
     });
 
-    Route::post('/stats', [StatisticsController::class, 'index']);
+    Route::post('/stats', [StatisticController::class, 'index']);
 });
 
 Route::middleware('guest')->group(function () {
