@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -80,9 +79,9 @@ class CategorySeeder extends Seeder
             'Investment Income',
         ]);
 
-        $this->insertCollection('Other Income',[]);
-        $this->insertCollection('Other Expenses',[]);
-        $this->insertCollection('Transfer',[]);
+        $this->insertCollection('Other Income', []);
+        $this->insertCollection('Other Expenses', []);
+        $this->insertCollection('Transfer', []);
     }
 
     private function categories(Category $parent, array $children): array

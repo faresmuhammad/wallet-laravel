@@ -5,6 +5,7 @@ use App\Http\Controllers\API\V1\Auth\LoginApiController;
 use App\Http\Controllers\API\V1\Auth\RegisterApiController;
 use App\Http\Controllers\API\V1\Auth\ResetPasswordApiController;
 use App\Http\Controllers\API\V1\RecordController;
+use App\Http\Controllers\API\V1\StatisticsController;
 use App\Http\Controllers\API\V1\WalletController;
 use App\Http\Controllers\API\V1\CategoryLabelController;
 use Illuminate\Http\Request;
@@ -54,6 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/categories/{category}', 'destroyCategory');
         Route::delete('/labels/{label}', 'destroyLabel');
     });
+
+    Route::post('/stats', [StatisticsController::class, 'index']);
 });
 
 Route::middleware('guest')->group(function () {

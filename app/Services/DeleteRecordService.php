@@ -49,7 +49,7 @@ class DeleteRecordService
         $transfer->receiverWallet->update([
             'balance' => $transfer->receiverWallet->balance - $record->amount
         ]);
-        
+
         $record->labels()->detach();
         $record->delete();
         DB::commit();

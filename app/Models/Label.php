@@ -17,5 +17,10 @@ class Label extends Model
         return $this->belongsToMany(Record::class, 'label_record_pivot', 'label_id', 'record_id');
     }
 
+//    public function stats(): BelongsToMany
+//    {
+//        return $this->belongsToMany(Statistic::class, 'label_stat_pivot',  'label_id','stat_id');
+//    }
+
 
 }

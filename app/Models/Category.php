@@ -16,12 +16,12 @@ class Category extends Model
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Category::class,'parent_id');
+        return $this->belongsTo(Category::class, 'parent_id');
     }
 
     public function subcategories(): HasMany
     {
-        return $this->hasMany(Category::class,'parent_id');
+        return $this->hasMany(Category::class, 'parent_id');
     }
 
     public function records(): HasMany
@@ -29,5 +29,10 @@ class Category extends Model
         return $this->hasMany(Record::class);
 
     }
+
+//    public function stats(): BelongsToMany
+//    {
+//        return $this->belongsToMany(Statistic::class, 'category_stat_pivot','category_id','stat_id');
+//    }
 
 }
