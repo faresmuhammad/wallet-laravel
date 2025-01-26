@@ -17,6 +17,9 @@ return new class extends Migration
             $table->enum('type',['sum','average']);
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
+            $table->string('show_by')->default('month');
+            $table->string('filter_by')->default('category');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
     }

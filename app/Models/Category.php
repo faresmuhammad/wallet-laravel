@@ -30,9 +30,5 @@ class Category extends Model
 
     }
 
-//    public function stats(): BelongsToMany
-//    {
-//        return $this->belongsToMany(Statistic::class, 'category_stat_pivot','category_id','stat_id');
-//    }
 
 }
