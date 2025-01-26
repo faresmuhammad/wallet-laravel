@@ -16,7 +16,6 @@
         "laravel/ui": "^4.2"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.13",
         "beyondcode/laravel-dump-server": "^1.9",
         "fakerphp/faker": "^1.9.1",
         "laradumps/laradumps": "^3.0",
