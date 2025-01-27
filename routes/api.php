@@ -57,8 +57,17 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(StatisticController::class)->group(function () {
-        Route::get('/statistics', 'index'); 
-     });
+        Route::get('/statistics', 'index');
+        Route::get('/statistics/{statistic}', 'show');
+        Route::post('/statistics', 'store');
+        Route::put('/statistics/{statistic}', 'update');
+        Route::delete('/statistics/{statistic}', 'destroy');
+    });
+
+    Route::group(['prefix' => 'dashboard'], function () {
+        Route::get('/balance', [StatisticController::class, 'balance']);
+
+    });
 });
 
 Route::middleware('guest')->group(function () {

@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SatisticResource extends JsonResource
+class StatisticResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,14 +15,15 @@ class SatisticResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'type' => ucfirst($this->type),
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
-            'show_by' => $this->show_by,
-            'filter_by' => $this->filter_by,
-            'categories' => $this->categories,
-            'labels' => $this->labels,
+            'show_by' => ucfirst($this->show_by),
+            'filter_by' => ucfirst($this->filter_by),
+            'categories' => CategoryResource::collection($this->categories),
+            'labels' => LabelResource::collection($this->labels),
         ];
     }
 }
