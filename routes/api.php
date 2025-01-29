@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/wallets', 'index');
         Route::get('/wallets/{wallet}', 'show');
         Route::post('/wallets', 'store');
+        Route::post('/wallets/correct/{wallet}', 'correct');
         Route::put('/wallets/{wallet}', 'update');
         Route::delete('/wallets/{wallet}', 'destroy');
     });

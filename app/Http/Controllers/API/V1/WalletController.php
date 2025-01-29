@@ -41,4 +41,10 @@ class WalletController extends Controller
         $wallet->delete();
         return apiResponse('Wallet deleted!');
     }
+
+    public function correct(Wallet $wallet,Request $request)
+    {
+        $walletResource = new WalletResource($this->service->correctBalance($wallet, $request));
+        return apiResponse('Balance Correct Successfully!', $walletResource);
+    }
 }

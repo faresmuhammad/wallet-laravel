@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Enums\RecordType;
 use App\Http\Resources\RecordResource;
 use App\Http\Resources\WalletResource;
+use App\Models\Record;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 
@@ -37,4 +39,31 @@ class WalletService
         return $wallet;
     }
 
+    public function correctBalance(Wallet $wallet, Request $request): Wallet
+    {
+        if ($request->actual_balance) {
+            $amount = $wallet->balance - $request->actual_balance;
+            $wallet->records()->create([
+                'name' => 'Error Amount',
+                'amount' => abs($amount),
+                'currency' => $wallet->currency,
+                'type' => $amount > 0 ? RecordType::Expense : RecordType::Income
+            ]);
+            $wallet->update(['balance' => $request->actual_balance]);
+
+        }
+        if ($request->error_amount) {
+            $wallet->update(['balance' => $wallet->balance - $request->error_amount]);
+            $record = $wallet->records()->create([
+                'name' => 'Error Amount',
+                'amount' => abs($request->error_amount),
+                'currency' => $wallet->currency,
+                'type' => $request->error_amount > 0 ? RecordType::Expense : RecordType::Income
+            ]);
+            $record->labels()->firstOrCreate([
+                'name' => 'Error',
+            ]);
+        }
+        return $wallet;
+    }
 }
