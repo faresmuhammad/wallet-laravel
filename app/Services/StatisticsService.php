@@ -3,6 +3,7 @@
 namespace App\Services;
 
 
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -37,19 +38,16 @@ class StatisticsService
             'balances' => $balances,
         ];
     }
+    
 
-    private function rate($from = 'USD', $to = 'EGP'): float
+    public static function rate($from = 'USD', $to = 'EGP')
     {
         if (Cache::has("currency-{$from}-{$to}")) {
             return Cache::get("currency-{$from}-{$to}");
         }
-        $response = Http::withHeader('apy-token', 'APY0GhvlsJRhxNesUgcfk8BnjmgvIN1X2wT40phVpIoDf3XegXngr4wj7MZiBAYHd')
-            ->post("https://api.apyhub.com/data/convert/currency", [
-                'source' => $from,
-                'target' => $to,
-            ]);
-        $rate = round($response->json('data'), 2);
-        Cache::put("currency-{$from}-{$to}", $rate, 60 * 24);
+        $response = Http::get('https://openexchangerates.org/api/latest.json?app_id=' . Env::get('OPENEXCHANGE_APP_ID') . '&base=' . $from . '&symbols=' . $to);
+        $rate = round($response->json('rates')[$to], 2);
+        Cache::put("currency-{$from}-{$to}", $rate,60);
         return $rate;
     }
 }
