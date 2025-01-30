@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\RecordType;
+use App\Filament\Resources\RecordResource;
 use App\Models\Record;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -13,7 +14,11 @@ class RecentRecords extends BaseWidget
 {
     public function table(Table $table): Table
     {
+        $query = RecordResource::getEloquentQuery()->take(5);
         return $table
+            ->query($query)
+            ->paginated(false)
+            ->defaultSort('date','desc')
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('amount')->formatStateUsing(fn($state, $record) => Number::currency($state, $record->currency)),
@@ -25,8 +30,6 @@ class RecentRecords extends BaseWidget
                         RecordType::Transfer => 'warning',
                     })
                     ->badge(),
-            ])
-            ->query(Record::where('date', '>=', now()->subDays(7))->limit(5))
-            ->paginated(false);
+            ]);
     }
 }

@@ -20,15 +20,17 @@ class StatisticsService
                 $balances[$wallet->currency] += $wallet->balance;
             else
                 $balances[$wallet->currency] = $wallet->balance;
+        }
+        foreach ($wallets as $wallet) {
 
             if ($wallet->currency != 'EGP') {
                 $rate = $this->rate(from: $wallet->currency);
                 $totalBalanceInEGP += $wallet->balance * $rate;
                 $balances[$wallet->currency] = [
                     'currency' => $wallet->currency,
-                    'balance' => $balances[$wallet->currency],
+                    'value' => $balances[$wallet->currency],
                     'rate' => $rate,
-                    'EGPBalance' => $balances[$wallet->currency] * $rate,
+                    'EGPValue' => $balances[$wallet->currency] * $rate,
                 ];
             } else
                 $totalBalanceInEGP += $wallet->balance;
@@ -38,16 +40,16 @@ class StatisticsService
             'balances' => $balances,
         ];
     }
-    
 
-    public static function rate($from = 'USD', $to = 'EGP')
+
+    public function rate($from = 'USD', $to = 'EGP')
     {
         if (Cache::has("currency-{$from}-{$to}")) {
             return Cache::get("currency-{$from}-{$to}");
         }
         $response = Http::get('https://openexchangerates.org/api/latest.json?app_id=' . Env::get('OPENEXCHANGE_APP_ID') . '&base=' . $from . '&symbols=' . $to);
         $rate = round($response->json('rates')[$to], 2);
-        Cache::put("currency-{$from}-{$to}", $rate,60);
+        Cache::put("currency-{$from}-{$to}", $rate, 60);
         return $rate;
     }
 }
