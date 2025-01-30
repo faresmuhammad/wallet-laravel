@@ -12,9 +12,7 @@ return new class extends Migration {
     {
         Schema::create('transfers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sender_balance');
             $table->unsignedBigInteger('sender_wallet');
-            $table->unsignedBigInteger('receiver_balance');
             $table->unsignedBigInteger('receiver_wallet');
             $table->double('amount');
             $table->dateTime('date')->default(now());

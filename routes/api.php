@@ -4,8 +4,10 @@ use App\Http\Controllers\API\V1\Auth\ForgotPasswordApiController;
 use App\Http\Controllers\API\V1\Auth\LoginApiController;
 use App\Http\Controllers\API\V1\Auth\RegisterApiController;
 use App\Http\Controllers\API\V1\Auth\ResetPasswordApiController;
+use App\Http\Controllers\API\V1\CategoryLabelController;
 use App\Http\Controllers\API\V1\RecordController;
-use App\Http\Controllers\API\V1\StrategyController;
+use App\Http\Controllers\API\V1\StatisticController;
+use App\Http\Controllers\API\V1\WalletController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,19 +27,47 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::controller(StrategyController::class)->group(function () {
-        Route::post('/strategies', 'store');
-        Route::put('/strategies/{strategy}', 'updateName');
-        Route::post('/strategies/{strategy}/activate', 'activateStrategy');
+    Route::controller(WalletController::class)->group(function () {
+        Route::get('/wallets', 'index');
+        Route::get('/wallets/{wallet}', 'show');
+        Route::post('/wallets', 'store');
+        Route::post('/wallets/correct/{wallet}', 'correct');
+        Route::put('/wallets/{wallet}', 'update');
+        Route::delete('/wallets/{wallet}', 'destroy');
     });
 
     Route::controller(RecordController::class)->group(function () {
+        Route::get('/records/{wallet}', 'index');
         Route::post('/pay/{wallet}', 'pay');
-        Route::post('/topup/{id?}', 'topup');
+        Route::post('/topup/{wallet}', 'topup');
         Route::post('/transfer', 'transfer');
         Route::put('/update-record/{record}', 'updateRecord');
         Route::put('/update-transfer/{record}', 'updateTransfer');
         Route::delete('/delete-record/{record}', 'delete');
+    });
+
+    Route::controller(CategoryLabelController::class)->group(function () {
+        Route::get('/categories', 'categories');
+        Route::get('/labels', 'labels');
+        Route::post('/categories', 'storeCategory');
+        Route::post('/labels', 'storeLabel');
+        Route::put('/categories/{category}', 'updateCategory');
+        Route::put('/labels/{label}', 'updateLabel');
+        Route::delete('/categories/{category}', 'destroyCategory');
+        Route::delete('/labels/{label}', 'destroyLabel');
+    });
+
+    Route::controller(StatisticController::class)->group(function () {
+        Route::get('/statistics', 'index');
+        Route::get('/statistics/{statistic}', 'show');
+        Route::post('/statistics', 'store');
+        Route::put('/statistics/{statistic}', 'update');
+        Route::delete('/statistics/{statistic}', 'destroy');
+    });
+
+    Route::group(['prefix' => 'dashboard'], function () {
+        Route::get('/balance', [StatisticController::class, 'balance']);
+
     });
 });
 

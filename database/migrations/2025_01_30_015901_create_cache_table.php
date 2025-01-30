@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('balance_per_dates', function (Blueprint $table) {
-            $table->id();
-            $table->double('value');
-            $table->foreignId('wallet_id')->constrained('wallets')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->date('date');
+        Schema::create('cache', function (Blueprint $table) {
+            $table->string('key')->unique();
+            $table->text('value');
+            $table->integer('expiration');
         });
     }
 
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('balances_per_date');
+        Schema::dropIfExists('cache');
     }
 };

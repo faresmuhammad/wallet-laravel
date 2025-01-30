@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('budget_category_pivot', function (Blueprint $table) {
+        Schema::create('labels', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('budget_id');
-            $table->unsignedBigInteger('category_id');
+            $table->string('name', 100);
+            $table->foreignId('user_id')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('budget_category_pivot');
+        Schema::dropIfExists('labels');
     }
 };

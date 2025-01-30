@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -29,31 +28,25 @@ class CategorySeeder extends Seeder
         $this->insertCollection('Food', [
             'Groceries',
             'Dining out',
+            'Talabat',
         ]);
 
-        $this->insertCollection('Leisure', [
-            'Movies',
-            'Video Rental',
-            'Magazines',
-        ]);
-
-        $this->insertCollection('Automobile', [
-            'Maintenance',
-            'Gas',
-            'Parking',
-            'Registration',
+        $this->insertCollection('Transportation', [
+            'Fuel',
+            'Public Transport',
+            'Taxi',
+            'Car Maintenance',
         ]);
 
         $this->insertCollection('Education', [
             'Books',
-            'Tuition',
-            'Others',
+            'Courses',
         ]);
 
-        $this->insertCollection('Homeneeds', [
+        $this->insertCollection('Home Needs', [
             'Clothing',
             'Furnishing',
-            'Others',
+            'Equipment',
         ]);
 
         $this->insertCollection('Healthcare', [
@@ -64,12 +57,6 @@ class CategorySeeder extends Seeder
             'Prescriptions',
         ]);
 
-        $this->insertCollection('Insurance', [
-            'Life',
-            'Home',
-            'Health',
-            'Auto',
-        ]);
 
         $this->insertCollection('Vacation', [
             'Travel',
@@ -92,9 +79,9 @@ class CategorySeeder extends Seeder
             'Investment Income',
         ]);
 
-        $this->insertCollection('Other Income',[]);
-        $this->insertCollection('Other Expenses',[]);
-        $this->insertCollection('Transfer',[]);
+        $this->insertCollection('Other Income', []);
+        $this->insertCollection('Other Expenses', []);
+        $this->insertCollection('Transfer', []);
     }
 
     private function categories(Category $parent, array $children): array

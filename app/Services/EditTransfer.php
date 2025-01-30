@@ -22,16 +22,18 @@ class EditTransfer
     /**
      * @throws \Throwable
      */
-    public function editRecord(Record $record, array $data): JsonResponse
+    public function editTransferRecord(Record $record, TransferRecordRequest $request): Record
     {
         throw_if($record->type != RecordType::Transfer, new HttpResponseException(
             apiResponse("Record Type Error.", [], ["This record is not a transfer."], status: 403)
         ));
+        $amountChanged = $request->amount != $record->amount;
+        $walletsChanged = $request->sender_wallet != $record->transfer->sender_wallet || $request->receiver_wallet != $record->transfer->receiver_wallet;
+        throw_if(!$amountChanged && !$walletsChanged, new HttpResponseException(
+            apiResponse("You didn't modify amount or wallets.", status: 204)
+        ));
+
         DB::beginTransaction();
-        $amountChanged = $data['amount'] != $record->amount;
-        $walletsChanged = $data['sender_wallet'] != $record->transfer->sender_wallet || $data['receiver_wallet'] != $record->transfer->receiver_wallet;
-        if (!$amountChanged && !$walletsChanged)
-            return apiResponse("You didn't modify amount or wallets.", status: 204);
 
         $oldSenderWallet = Wallet::find($record->transfer->sender_wallet);
         $oldReceiverWallet = Wallet::find($record->transfer->receiver_wallet);
@@ -41,30 +43,31 @@ class EditTransfer
         $oldSenderWallet->update(['balance' => $this->originalBalance($oldSenderWallet->balance, $record->amount, SenderOrReceiver::Sender)]);
         $oldReceiverWallet->update(['balance' => $this->originalBalance($oldReceiverWallet->balance, $record->amount, SenderOrReceiver::Receiver)]);
 
-        $newSenderWallet = Wallet::find($data['sender_wallet']);
-        $newReceiverWallet = Wallet::find($data['receiver_wallet']);
+        $newSenderWallet = Wallet::find($request->sender_wallet);
+        $newReceiverWallet = Wallet::find($request->receiver_wallet);
 
-        throw_if($newSenderWallet->currency_id != $newReceiverWallet->currency_id, new HttpResponseException(
+        throw_if($newSenderWallet->currency != $newReceiverWallet->currency, new HttpResponseException(
             apiResponse("Error while transfer process.", [], ["Can't transfer to a different currency!"], status: 403)
         ));
 
-        $newSenderWallet->update(['balance' => $newSenderWallet->balance - $data['amount']]);
-        $newReceiverWallet->update(['balance' => $newReceiverWallet->balance + $data['amount']]);
+        $newSenderWallet->update(['balance' => $newSenderWallet->balance - $request->amount]);
+        $newReceiverWallet->update(['balance' => $newReceiverWallet->balance + $request->amount]);
 
         $record->update([
-            'name' => $data['name'] ?? $record->name,
-            'amount' => $data['amount'] ?? $record->amount,
-            'date' => $data['date'] ?? $record->date,
+            'name' => $request->name ?? $record->name,
+            'amount' => $request->amount ?? $record->amount,
+            'date' => $request->date ?? $record->date,
 
         ]);
+        $record->labels()->sync($request->labels);
         //todo: update balance per date
 
 
         $record->transfer->update(
             [
-                'name' => $data['name'] ?? $record->name,
-                'amount' => $data['amount'] ?? $record->amount,
-                'date' => $data['date'] ?? $record->date,
+                'name' => $request->name ?? $record->name,
+                'amount' => $request->amount ?? $record->amount,
+                'date' => $request->date ?? $record->date,
                 'sender_wallet' => $newSenderWallet->id,
                 'receiver_wallet' => $newReceiverWallet->id,
             ]
@@ -72,7 +75,7 @@ class EditTransfer
 
         DB::commit();
 
-        return apiResponse("Transfer has been updated!", new TransferResource($record->transfer), status: 200);
+        return $record;
     }
 
     private function originalBalance(float $currentBalance, float $amount, SenderOrReceiver $state): float

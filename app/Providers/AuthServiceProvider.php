@@ -25,8 +25,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('create-currency', fn(User $user) => $user->isAdmin());
-        Gate::define('update-currency', fn(User $user) => $user->isAdmin());
-        Gate::define('delete-currency', fn(User $user) => $user->isAdmin());
+        //
     }
 }

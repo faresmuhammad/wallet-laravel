@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('balance_per_dates', function (Blueprint $table) {
-            $table->id();
-            $table->double('value');
-            $table->foreignId('wallet_id')->constrained('wallets')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->date('date');
+        Schema::create('category_statistic_pivot', function (Blueprint $table) {
+            $table->foreignId('statistic_id')->constrained('statistics');
+            $table->foreignId('category_id')->constrained('categories');
         });
     }
 
@@ -24,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('balances_per_date');
+        Schema::dropIfExists('category_statistic_pivot');
     }
 };

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PayRequest extends FormRequest
+class StatisticRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,21 +22,12 @@ class PayRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => 'required|numeric',
-            'name' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
-            'date' => 'date',
-            'currency' => 'string',
-            'labels' => 'array',
-            'labels.*' => 'integer|exists:labels,id',
+            'name' => 'string',
+            'type' => 'string|in:sum,average',
+            'start_date' => 'date|date_format:Y-m-d|nullable',
+            'end_date' => 'date|date_format:Y-m-d|after:start_date|nullable',
+            'show_by' => 'string',
+            'filter_by' => 'string'
         ];
     }
-
-    protected function prepareForValidation()
-    {
-        $this->merge([
-           'date' => $this->date ?? now()
-        ]);
-    }
-
 }

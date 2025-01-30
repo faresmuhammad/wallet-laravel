@@ -12,9 +12,11 @@ class DeleteRecordService
     public function deleteExpenseRecord(Record $record): JsonResponse
     {
         DB::beginTransaction();
-        $record->relatedWallet->update([
-            'balance' => $record->relatedWallet->balance + $record->amount
+        $wallet = $record->wallet;
+        $wallet->update([
+            'balance' => $wallet->balance + $record->amount
         ]);
+        $record->labels()->detach();
         $record->delete();
         DB::commit();
         return apiResponse("Record deleted successfully");
@@ -25,20 +27,11 @@ class DeleteRecordService
         //if regular income, remove the amount from the wallet then delete the record
         //if strategy income, remove each wallet amount
         DB::beginTransaction();
-        $wallet = $record->relatedWallet;
-        if ($wallet) {
-            $wallet->update([
-                'balance' => $wallet->balance - $record->amount
-            ]);
-
-        } else {
-            $rules = $record->strategy->rules;
-            foreach ($rules as $rule) {
-                $rule->wallet()->update([
-                    'balance' => $rule->wallet->balance - ($record->amount * $rule->ratio)
-                ]);
-            }
-        }
+        $wallet = $record->wallet;
+        $wallet->update([
+            'balance' => $wallet->balance - $record->amount
+        ]);
+        $record->labels()->detach();
         $record->delete();
         DB::commit();
         return apiResponse("Record deleted successfully");
@@ -56,6 +49,7 @@ class DeleteRecordService
             'balance' => $transfer->receiverWallet->balance - $record->amount
         ]);
 
+        $record->labels()->detach();
         $record->delete();
         DB::commit();
         return apiResponse("Record deleted successfully");

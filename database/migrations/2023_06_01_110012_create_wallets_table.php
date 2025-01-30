@@ -13,16 +13,11 @@ return new class extends Migration {
         Schema::create('wallets', function (Blueprint $table) {
             $table->id();
             $table->string('name', 40);
-            $table->string('color', 7);
-            $table->double('initial_balance');
-            $table->boolean('include_to_stats')->default(true);
-            $table->unsignedBigInteger('user_id');
+            $table->double('balance');
+            $table->string('currency',3)->default('EGP');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')
-                ->on('users')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
         });
     }
 

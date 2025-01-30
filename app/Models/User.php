@@ -52,13 +52,18 @@ class User extends Authenticatable
         return $this->hasMany(Wallet::class);
     }
 
-    public function budgets(): HasMany
+    public function categories(): HasMany
     {
-        return $this->hasMany(Budget::class);
+        return $this->hasMany(Category::class)->with('subcategories')->whereNull('parent_id');
     }
 
-    public function isAdmin()
+    public function labels(): HasMany
     {
-        return $this->is_admin;
+        return $this->hasMany(Label::class);
+    }
+
+    public function statistics(): HasMany
+    {
+        return $this->hasMany(Statistic::class);
     }
 }

@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 class EditRecord
 {
 
-    public function editRecord(Record $record, array $data): JsonResponse
+    public function editRecord(Record $record, UpdateRecordRequest $request): Record
     {
         /*
          * ** Budget Updates ** -> todo
@@ -28,22 +28,23 @@ class EditRecord
         DB::beginTransaction();
         $this->updateBalance(
             $record,
-            $data['amount'],
+            $request->amount,
             from: $record->type,
-            to: isset($data['type']) ? RecordType::from($data['type']) : $record->type
+            to: $request->type ? RecordType::from($request->type) : $record->type
         );
 
-        $record->update($data);
-
+        $record->update($request->safe()->except('labels'));
+        $record->labels()->sync($request->labels);
         //todo: update balance per date
         DB::commit();
 
-        return apiResponse('Record Updated Successfully', new RecordUpdatedResource($record));
+        return $record;
     }
 
 
     /**
      * @throws HttpResponseException
+     * @throws \Throwable
      */
     private function updateBalance(
         Record     $record,
@@ -52,31 +53,16 @@ class EditRecord
         RecordType $to,
     ): void
     {
-        $wallet = $record->relatedWallet;
-        if ($wallet) {
-            $wallet->update([
-                'balance' => $this->updatedValue(
-                    currentBalance: $wallet->balance,
-                    currentRecord: $record->amount,
-                    newRecord: $newAmount,
-                    from: $from, to: $to
-                )
-            ]);
-        } else {
-            //wallet is null means that this record operated by strategy rules
-            $rules = $record->strategy->rules;
-            foreach ($rules as $rule) {
-                $rule->wallet()->update([
-                    'balance' => $this->updatedValueForNonWalletRecord(
-                        currentBalance: $rule->wallet->balance,
-                        currentRecord: $record->amount * $rule->ratio,
-                        newRecord: $newAmount * $rule->ratio,
-                        from: $from, to: $to
-                    )
-                ]);
-            }
-        }
-
+        $wallet = $record->wallet;
+        throw_if(is_null($wallet), new HttpResponseException(apiResponse("Wallet not found!", [], ["Wallet not found!"], 404)));
+        $wallet->update([
+            'balance' => $this->updatedValue(
+                currentBalance: $wallet->balance,
+                currentRecord: $record->amount,
+                newRecord: $newAmount,
+                from: $from, to: $to
+            )
+        ]);
     }
 
 

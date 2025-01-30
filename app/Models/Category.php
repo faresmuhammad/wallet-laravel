@@ -12,18 +12,16 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name', 'description', 'color'
-    ];
+    protected $guarded = [];
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'parent_id');
     }
 
     public function subcategories(): HasMany
     {
-        return $this->hasMany(Category::class,'parent_id');
+        return $this->hasMany(Category::class, 'parent_id');
     }
 
     public function records(): HasMany
@@ -32,8 +30,5 @@ class Category extends Model
 
     }
 
-    public function budgets(): BelongsToMany
-    {
-        return $this->belongsToMany(Budget::class,'budget_category_pivot');
-    }
+
 }

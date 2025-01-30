@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('budget_wallet_pivot', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('budget_id');
-            $table->unsignedBigInteger('wallet_id');
+        Schema::create('label_statistic_pivot', function (Blueprint $table) {
+            $table->foreignId('statistic_id')->constrained('statistics');
+            $table->foreignId('label_id')->constrained('labels');
         });
     }
 
@@ -23,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('budget_wallet_pivot');
+        Schema::dropIfExists('label_statistic_pivot');
     }
 };

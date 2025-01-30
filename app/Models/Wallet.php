@@ -16,12 +16,12 @@ class Wallet extends Model
 
     protected static function booted(): void
     {
-        static::creating(function (Wallet $wallet) {
+        /*static::creating(function (Wallet $wallet) {
             if (auth()->user())
                 $wallet->user_id = auth()->id();
             else
                 $wallet->user_id = 1;
-        });
+        });*/
 
     }
 
@@ -30,25 +30,11 @@ class Wallet extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function strategy(): BelongsTo
-    {
-        return $this->belongsTo(Strategy::class);
-    }
-
-    public function rule(): BelongsTo
-    {
-        return $this->belongsTo(StrategyRule::class,'rule_id');
-    }
-
-    public function budgets(): BelongsToMany
-    {
-        return $this->belongsToMany(Budget::class, 'budget_wallet_pivot');
-    }
 
 
     public function records(): HasMany
     {
-        return $this->hasMany(Record::class,'related_to');
+        return $this->hasMany(Record::class);
     }
 
     public function scopeIncludedToStats($query)
