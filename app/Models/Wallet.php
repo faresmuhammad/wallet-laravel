@@ -36,4 +36,9 @@ class Wallet extends Model
     {
         return $this->hasMany(Record::class);
     }
+
+    public function scopeIncludedToStats($query)
+    {
+        return $query->where('include_to_stats', true);
+    }
 }

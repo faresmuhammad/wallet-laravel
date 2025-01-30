@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 class DeleteRecordService
 {
 
-    //delete pay
     public function deleteExpenseRecord(Record $record): JsonResponse
     {
         DB::beginTransaction();

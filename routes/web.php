@@ -25,7 +25,8 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/', function (){
-    return redirect('/wallets');
+    dd(auth()->user()->wallets()->includedToStats()->get());
+    return view('welcome');
 })->name('home');
 
 Route::middleware('auth')->group(function (){
