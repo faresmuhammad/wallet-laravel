@@ -38,7 +38,7 @@ class ListRecords extends BaseListRecords
                     return $data;
                 })
                 ->action(function (array $data, NewRecord $service) {
-                    $service->pay(Wallet::find($data['related_to']), $data);
+                    $service->pay(Wallet::find($data['wallet_id']), $data);
                 }),
             Actions\Action::make('topup')
                 ->label('Top Up')
@@ -49,7 +49,7 @@ class ListRecords extends BaseListRecords
                     return $data;
                 })
                 ->action(function (array $data, NewRecord $service) {
-                    $service->topup($data['related_to'], $data);
+                    $service->topup($data['wallet_id'], $data);
                 }),
             Actions\Action::make('transfer')
                 ->label('Transfer')

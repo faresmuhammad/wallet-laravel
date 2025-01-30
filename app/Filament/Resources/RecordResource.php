@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Number;
 
 class RecordResource extends Resource
 {
@@ -30,7 +31,7 @@ class RecordResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('amount')->money('EGP'),//->prefix('£'),
+                Tables\Columns\TextColumn::make('amount')->formatStateUsing(fn($state, $record) => Number::currency($state, $record->currency)),
                 Tables\Columns\TextColumn::make('type')
                     ->color(fn($state): string => match ($state) {
                         RecordType::Income => 'success',
@@ -41,7 +42,7 @@ class RecordResource extends Resource
                 Tables\Columns\TextColumn::make('date')
                     ->dateTimeTooltip('d/m/Y h:i A')
                     ->since(),
-                Tables\Columns\TextColumn::make('relatedWallet.name')
+                Tables\Columns\TextColumn::make('wallet.name')
                     ->label('Wallet')
                     ->badge()
             ])
@@ -56,7 +57,7 @@ class RecordResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->paginated(false)
+            ->paginated(true)
             ->defaultSort('date', 'desc');
     }
 

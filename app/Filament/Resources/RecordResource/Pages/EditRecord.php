@@ -77,8 +77,8 @@ class EditRecord extends BaseEditRecord
             'name' => $this->record->name,
             'amount' => $this->record->amount,
             'date' => $this->record->date,
-            'sender_wallet' => $this->record->transfer->sender_wallet,
-            'receiver_wallet' => $this->record->transfer->receiver_wallet,
+//            'sender_wallet' => $this->record->transfer->sender_wallet,
+//            'receiver_wallet' => $this->record->transfer->receiver_wallet,
         ]);
     }
 

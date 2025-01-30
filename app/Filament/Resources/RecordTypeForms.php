@@ -25,13 +25,13 @@ trait RecordTypeForms
                 ->maxDate(now())
                 ->default(now())
                 ->required(),
-            Select::make('related_to')
-                ->label('Related Wallet')
+            Select::make('wallet_id')
+                ->label('Wallet')
                 ->required()
                 ->relationship(
-                    name: 'relatedWallet',
+                    name: 'wallet',
                     titleAttribute: 'name',
-                    modifyQueryUsing: fn($query) => Strategy::isActive()->first()->wallets()
+                    modifyQueryUsing: fn($query) => auth()->user()->wallets()
                 ),
             Select::make('category_id')
                 ->label('Category')
@@ -59,12 +59,12 @@ trait RecordTypeForms
                 ->maxDate(now())
                 ->default(now())
                 ->required(),
-            Select::make('related_to')
-                ->label('Related Wallet')
+            Select::make('wallet_id')
+                ->label('Wallet')
                 ->relationship(
-                    name: 'relatedWallet',
+                    name: 'wallet',
                     titleAttribute: 'name',
-                    modifyQueryUsing: fn($query) => Strategy::isActive()->first()->wallets()
+                    modifyQueryUsing: fn($query) => auth()->user()->wallets()
                 ),
             Select::make('category_id')
                 ->label('Category')
