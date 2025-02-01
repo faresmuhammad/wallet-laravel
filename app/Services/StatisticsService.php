@@ -3,6 +3,7 @@
 namespace App\Services;
 
 
+use Carbon\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -22,14 +23,15 @@ class StatisticsService
                 $balances[$wallet->currency] = $wallet->balance;
         }
         foreach ($wallets as $wallet) {
-
             if ($wallet->currency != 'EGP') {
-                $rate = $this->rate(from: $wallet->currency);
+                $currencyRate = $this->rate(from: $wallet->currency);
+                $rate = $currencyRate['rate'];
                 $totalBalanceInEGP += $wallet->balance * $rate;
                 $balances[$wallet->currency] = [
                     'currency' => $wallet->currency,
                     'value' => $balances[$wallet->currency],
                     'rate' => $rate,
+                    'lastUpdated' => $currencyRate['lastUpdated'],
                     'EGPValue' => $balances[$wallet->currency] * $rate,
                 ];
             } else
@@ -49,7 +51,11 @@ class StatisticsService
         }
         $response = Http::get('https://openexchangerates.org/api/latest.json?app_id=' . Env::get('OPENEXCHANGE_APP_ID') . '&base=' . $from . '&symbols=' . $to);
         $rate = round($response->json('rates')[$to], 2);
-        Cache::put("currency-{$from}-{$to}", $rate, 60);
-        return $rate;
+        $output = [
+            'rate' => $rate,
+            'lastUpdated' => Carbon::parse($response->json('timestamp'))->diffForHumans(),
+        ];
+        Cache::put("currency-{$from}-{$to}", $output, 60);
+        return $output;
     }
 }

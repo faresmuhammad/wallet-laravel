@@ -5,6 +5,8 @@ namespace App\Filament\Resources\RecordResource\Pages;
 use App\Enums\RecordType;
 use App\Filament\Resources\RecordResource;
 use App\Filament\Resources\RecordTypeForms;
+use App\Http\Requests\PayRequest;
+use App\Http\Requests\TransferRecordRequest;
 use App\Models\Category;
 use App\Models\Record;
 use App\Models\Strategy;
@@ -17,6 +19,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\ListRecords as BaseListRecords;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 
 class ListRecords extends BaseListRecords
 {
@@ -38,7 +41,9 @@ class ListRecords extends BaseListRecords
                     return $data;
                 })
                 ->action(function (array $data, NewRecord $service) {
-                    $service->pay(Wallet::find($data['wallet_id']), $data);
+                    $request = PayRequest::create('','',$data);
+                    ds($request->all(),$data);
+                    $service->pay(Wallet::find($request->wallet_id), $request);
                 }),
             Actions\Action::make('topup')
                 ->label('Top Up')
@@ -49,7 +54,8 @@ class ListRecords extends BaseListRecords
                     return $data;
                 })
                 ->action(function (array $data, NewRecord $service) {
-                    $service->topup($data['wallet_id'], $data);
+                    $request = Request::create('','',$data);
+                    $service->topup(Wallet::find($request->wallet_id), $request);
                 }),
             Actions\Action::make('transfer')
                 ->label('Transfer')
@@ -60,7 +66,8 @@ class ListRecords extends BaseListRecords
                     return $data;
                 })
                 ->action(function (array $data, NewRecord $service) {
-                    $service->transfer($data);
+                    $request = TransferRecordRequest::create('','',$data);
+                    $service->transfer($request);
                 })
 
 
