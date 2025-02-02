@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CurrencyController;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -18,16 +19,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
+Route::get('/',function (){
+   return redirect(RouteServiceProvider::HOME);
 });
-
 Auth::routes();
 
-Route::get('/', function (){
-    dd(auth()->user()->wallets()->includedToStats()->get());
-    return view('welcome');
-})->name('home');
 
 Route::middleware('auth')->group(function (){
 

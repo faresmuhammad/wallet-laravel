@@ -36,23 +36,14 @@ class ListRecords extends BaseListRecords
                 ->label('Pay')
                 ->color('danger')
                 ->form($this->payForm())
-                ->mutateFormDataUsing(function (array $data) {
-                    $data['type'] = RecordType::Expense;
-                    return $data;
-                })
                 ->action(function (array $data, NewRecord $service) {
                     $request = PayRequest::create('','',$data);
-                    ds($request->all(),$data);
                     $service->pay(Wallet::find($request->wallet_id), $request);
                 }),
             Actions\Action::make('topup')
                 ->label('Top Up')
                 ->color('success')
                 ->form($this->topupForm())
-                ->mutateFormDataUsing(function (array $data) {
-                    $data['type'] = RecordType::Income;
-                    return $data;
-                })
                 ->action(function (array $data, NewRecord $service) {
                     $request = Request::create('','',$data);
                     $service->topup(Wallet::find($request->wallet_id), $request);
@@ -61,10 +52,6 @@ class ListRecords extends BaseListRecords
                 ->label('Transfer')
                 ->color('warning')
                 ->form($this->transferForm())
-                ->mutateFormDataUsing(function (array $data) {
-                    $data['type'] = RecordType::Transfer;
-                    return $data;
-                })
                 ->action(function (array $data, NewRecord $service) {
                     $request = TransferRecordRequest::create('','',$data);
                     $service->transfer($request);
