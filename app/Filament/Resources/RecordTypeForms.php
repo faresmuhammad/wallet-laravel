@@ -14,7 +14,7 @@ trait RecordTypeForms
     /**
      * @return array
      */
-    private function payForm(): array
+    private function payForm(bool $fromWallet = false): array
     {
         return [
             TextInput::make('name'),
@@ -32,7 +32,7 @@ trait RecordTypeForms
                     name: 'wallet',
                     titleAttribute: 'name',
                     modifyQueryUsing: fn($query) => auth()->user()->wallets()
-                ),
+                )->hidden($fromWallet),
             Select::make('category_id')
                 ->label('Category')
                 ->relationship('category', 'name')
@@ -48,7 +48,7 @@ trait RecordTypeForms
     /**
      * @return array
      */
-    private function topupForm(): array
+    private function topupForm(bool $fromWallet = false): array
     {
         return [
             TextInput::make('name'),
@@ -65,7 +65,7 @@ trait RecordTypeForms
                     name: 'wallet',
                     titleAttribute: 'name',
                     modifyQueryUsing: fn($query) => auth()->user()->wallets()
-                ),
+                )->hidden($fromWallet),
             Select::make('category_id')
                 ->label('Category')
                 ->relationship('category', 'name')

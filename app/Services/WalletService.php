@@ -42,23 +42,27 @@ class WalletService
     public function correctBalance(Wallet $wallet, Request $request): Wallet
     {
         if ($request->actual_balance) {
+            if ($wallet->balance == $request->actual_balance) return $wallet;
             $amount = $wallet->balance - $request->actual_balance;
             $wallet->records()->create([
                 'name' => 'Error Amount',
                 'amount' => abs($amount),
                 'currency' => $wallet->currency,
-                'type' => $amount > 0 ? RecordType::Expense : RecordType::Income
+                'type' => $amount > 0 ? RecordType::Expense : RecordType::Income,
+                'date' => now(),
             ]);
             $wallet->update(['balance' => $request->actual_balance]);
 
         }
         if ($request->error_amount) {
+            if ($request->error_amount == 0) return $wallet;
             $wallet->update(['balance' => $wallet->balance - $request->error_amount]);
             $record = $wallet->records()->create([
                 'name' => 'Error Amount',
                 'amount' => abs($request->error_amount),
                 'currency' => $wallet->currency,
-                'type' => $request->error_amount > 0 ? RecordType::Expense : RecordType::Income
+                'type' => $request->error_amount > 0 ? RecordType::Expense : RecordType::Income,
+                'date' => now(),
             ]);
             $record->labels()->firstOrCreate([
                 'name' => 'Error',

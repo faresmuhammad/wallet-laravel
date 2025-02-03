@@ -63,7 +63,8 @@ class NewRecord
             'name' => $request->name ?? 'No Name',
             'category_id' => $request->category_id,
             'date' => $request->date ?? now(),
-            'type' => RecordType::Income
+            'type' => RecordType::Income,
+            'currency' => $request->currency ?? 'EGP',
         ]);
         $record->labels()->sync($request->labels);
         $wallet->update([

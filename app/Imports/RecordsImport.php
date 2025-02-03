@@ -40,7 +40,6 @@ class RecordsImport implements ToModel
                     'currency' => 'USD',
                 ]);
                 $record = $newRecord->topup(Wallet::find(2), $request);
-                $this->attachLabelsToRecord($row, $record);
 
             } else {
                 $request = Request::create('/api/topup/1', 'POST', [
@@ -50,9 +49,9 @@ class RecordsImport implements ToModel
                     'date' => $row[4] == '' ? now() : $row[4],
                 ]);
                 $record = $newRecord->topup($wallet, $request);
-                $this->attachLabelsToRecord($row, $record);
 
             }
+            $this->attachLabelsToRecord($row, $record);
         }
 
     }

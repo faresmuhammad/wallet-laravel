@@ -22,7 +22,7 @@ class RecentRecords extends BaseWidget
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('amount')->formatStateUsing(fn($state, $record) => Number::currency($state, $record->currency)),
-                TextColumn::make('date')->dateTime(),
+                TextColumn::make('date')->dateTimeTooltip('Y-m-d h:i A')->since(),
                 TextColumn::make('type')
                     ->color(fn($state): string => match ($state) {
                         RecordType::Income => 'success',

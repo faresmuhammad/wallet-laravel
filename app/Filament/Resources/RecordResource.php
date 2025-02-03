@@ -6,6 +6,7 @@ use App\Enums\RecordType;
 use App\Filament\Resources\RecordResource\Pages;
 use App\Filament\Resources\RecordResource\RelationManagers;
 use App\Models\Record;
+use App\Models\Wallet;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -40,11 +41,18 @@ class RecordResource extends Resource
                     })
                     ->badge(),
                 Tables\Columns\TextColumn::make('date')
-                    ->dateTimeTooltip('d/m/Y h:i A')
+                    ->dateTimeTooltip('Y-m-d h:i A')
                     ->since(),
                 Tables\Columns\TextColumn::make('wallet.name')
                     ->label('Wallet')
                     ->badge()
+                    ->color(fn($state): string => match ($state) {
+                        'EGP' => 'warning',
+                        'USD' => 'success',
+                        default => 'danger',
+                    })
+                    ->action(fn(Record $record) => redirect(route('filament.wallet.resources.wallets.show', ['record' => $record->wallet_id])))
+
             ])
             ->filters([
 
@@ -57,7 +65,7 @@ class RecordResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->paginated(true)
+            ->paginated()
             ->defaultSort('date', 'desc');
     }
 

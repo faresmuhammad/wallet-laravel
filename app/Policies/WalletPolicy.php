@@ -21,14 +21,15 @@ class WalletPolicy
      */
     public function view(User $user, Wallet $wallet): bool
     {
-        return auth()->check() && $wallet->user_id === $user->id;
+        return auth()->id() == $wallet->user_id;
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
+        return auth()->check() && auth()->user() === $user;
     }
 
     /**
@@ -36,7 +37,7 @@ class WalletPolicy
      */
     public function update(User $user, Wallet $wallet): bool
     {
-        //
+        return auth()->id() == $wallet->user_id;
     }
 
     /**
@@ -44,7 +45,7 @@ class WalletPolicy
      */
     public function delete(User $user, Wallet $wallet): bool
     {
-        //
+        return auth()->id() == $wallet->user_id;
     }
 
     /**
@@ -52,7 +53,7 @@ class WalletPolicy
      */
     public function restore(User $user, Wallet $wallet): bool
     {
-        //
+        return auth()->id() == $wallet->user_id;
     }
 
     /**
@@ -60,6 +61,6 @@ class WalletPolicy
      */
     public function forceDelete(User $user, Wallet $wallet): bool
     {
-        //
+        return auth()->id() == $wallet->user_id;
     }
 }
