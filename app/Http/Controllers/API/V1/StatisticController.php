@@ -21,18 +21,13 @@ class StatisticController extends Controller
 
     public function store(StatisticRequest $request)
     {
-        $statistic = auth()->user()->statistics()->create($request->except(['categories', 'labels']));
-        $statistic->categories()->sync($request->categories);
-        $statistic->labels()->sync($request->labels);
+        $statistic = $this->service->createStatistic($request);
         return apiResponse('Statistic Created', new StatisticResource($statistic), status: 201);
     }
 
     public function update(StatisticRequest $request, Statistic $statistic)
     {
-        $statistic->update($request->except(['categories', 'labels']));
-        $statistic->categories()->sync($request->categories);
-        $statistic->labels()->sync($request->labels);
-        return apiResponse('Statistic Updated', new StatisticResource($statistic));
+        return apiResponse('Statistic Updated', new StatisticResource($this->service->updateStatistic($request, $statistic)));
     }
 
     public function show(Statistic $statistic)
@@ -42,9 +37,7 @@ class StatisticController extends Controller
 
     public function destroy(Statistic $statistic)
     {
-        $statistic->categories()->detach();
-        $statistic->labels()->detach();
-        $statistic->delete();
+        $this->service->destroyStatistic($statistic);
         return apiResponse('Statistic Deleted');
     }
 

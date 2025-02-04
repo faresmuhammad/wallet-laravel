@@ -3,6 +3,8 @@
 namespace App\Services;
 
 
+use App\Http\Requests\StatisticRequest;
+use App\Models\Statistic;
 use Carbon\Carbon;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Cache;
@@ -10,6 +12,30 @@ use Illuminate\Support\Facades\Http;
 
 class StatisticsService
 {
+
+    public function createStatistic(StatisticRequest $request): Statistic
+    {
+        $statistic = auth()->user()->statistics()->create($request->except(['categories', 'labels']));
+        $statistic->categories()->sync($request->categories);
+        $statistic->labels()->sync($request->labels);
+        return $statistic;
+    }
+
+    public function updateStatistic(StatisticRequest $request, Statistic $statistic): Statistic
+    {
+        $statistic->update($request->except(['categories', 'labels']));
+        $statistic->categories()->sync($request->categories);
+        $statistic->labels()->sync($request->labels);
+        return $statistic;
+    }
+
+    public function destroyStatistic(Statistic $statistic): Statistic
+    {
+        $statistic->categories()->detach();
+        $statistic->labels()->detach();
+        $statistic->delete();
+        return $statistic;
+    }
 
     public function totalBalance(): array
     {
